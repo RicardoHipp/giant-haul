@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TITAN HAUL – KUKA KR Loading Game</title>
+  <meta name="description" content="KUKA TITAN Tower – Physikbasiertes Stapelspiel mit dem KR TITAN Industrieroboter" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700;900&family=Share+Tech+Mono&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div id="game-wrapper">
+
+    <!-- SmartPAD HUD (oben links) -->
+    <div id="smartpad" class="smartpad-panel">
+      <div class="smartpad-header">
+        <span class="kuka-logo company-name-display">KUKA</span>
+        <div class="smartpad-led" id="led-status"></div>
+      </div>
+      <div class="smartpad-display">
+        <div class="display-row">
+          <span class="display-label">PUNKTE</span>
+          <span class="display-value" id="hud-score">0</span>
+        </div>
+        <div class="display-row">
+          <span class="display-label">TEILE</span>
+          <span class="display-value" id="hud-parts">0</span>
+        </div>
+        <div class="display-row">
+          <span class="display-label">ZEIT</span>
+          <span class="display-value" id="hud-level">0s</span>
+        </div>
+      </div>
+      <div class="smartpad-keys">
+        <div class="key-row">
+          <div class="smartpad-key"></div>
+          <div class="smartpad-key orange"></div>
+          <div class="smartpad-key"></div>
+        </div>
+        <div class="key-row">
+          <div class="smartpad-key"></div>
+          <div class="smartpad-key"></div>
+          <div class="smartpad-key orange"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Buttons oben rechts -->
+    <div id="top-buttons">
+      <button id="btn-restart" class="kuka-btn" onclick="game.restart()">
+        <span class="btn-icon">↺</span> RESTART
+      </button>
+    </div>
+
+    <!-- Haupt-Canvas -->
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- Geschwindigkeits-Panel (links mittig) -->
+    <div id="speed-panel">
+      <div class="speed-label">SPEED</div>
+      <button class="speed-btn" onclick="game.speedUp()">▲</button>
+      <div class="speed-display"><span id="speed-value">180</span><span class="speed-unit">px/s</span></div>
+      <button class="speed-btn" onclick="game.speedDown()">▼</button>
+      <div class="speed-hint">W / S / Rad</div>
+    </div>
+
+    <!-- Abschicken-Button (sichtbar während Beladung) -->
+    <div id="send-truck-bar" class="hidden">
+      <button id="btn-send" class="kuka-btn send-btn" onclick="game.sendTruck()">
+        🚛 LKW ABSCHICKEN
+      </button>
+      <span class="send-hint">oder <kbd>ENTER</kbd> / Rechtsklick</span>
+    </div>
+
+    <!-- Overlay: Startscreen -->
+    <div id="overlay-start" class="game-overlay">
+      <div class="overlay-box">
+        <div class="overlay-logo company-name-display">KUKA</div>
+        <h1 class="overlay-title">TITAN<br><span class="overlay-sub">HAUL</span></h1>
+        <p class="overlay-desc">
+          Belade den LKW mit dem KR TITAN – so viele Kisten wie möglich!<br><br>
+          <kbd>SPACE</kbd> / Klick &nbsp;= Kiste abwerfen<br>
+          <kbd>ENTER</kbd> / Rechtsklick &nbsp;= LKW abschicken<br>
+          <kbd>W</kbd> / <kbd>S</kbd> / Mausrad &nbsp;= Roboter-Speed ±<br><br>
+          Roboter holt neue Kisten <strong>am Rand</strong> ab.<br>
+          Fällt eine Kiste runter → Runde vorbei!<br>
+          <small>Punkte = Teile² × 100 / Zeit</small>
+        </p>
+        <button id="btn-start" class="kuka-btn big" onclick="game.start()">
+          START
+        </button>
+        <p class="overlay-hint">Klick / Leertaste = Abwurf</p>
+      </div>
+    </div>
+
+    <!-- Overlay: Game Over -->
+    <div id="overlay-gameover" class="game-overlay hidden">
+      <div class="overlay-box">
+        <div class="go-icon" id="go-icon">⚠</div>
+        <h2 class="go-title" id="go-title">SYSTEM FAULT</h2>
+        <p class="go-sub" id="go-sub">Kiste vom LKW gefallen!</p>
+        <div class="go-stats">
+          <div class="stat-row"><span>Teile geladen:</span><span id="go-parts">0</span></div>
+          <div class="stat-row"><span>Zeit:</span><span id="go-time">0s</span></div>
+          <div class="stat-row"><span>Punkte:</span><span id="go-score">0</span></div>
+          <div class="stat-row"><span>Lokaler Highscore:</span><span id="go-hi">0</span></div>
+        </div>
+
+        <!-- Globaler Highscore (Firebase) -->
+        <h3
+          style="color: var(--kuka-orange); font-size: 14px; margin-top: 15px; margin-bottom: 5px; text-transform: uppercase;">
+          TOP 3 WELTWEIT</h3>
+        <div id="global-highscores-list" class="go-stats"
+          style="font-size: 12px; margin-bottom: 20px; min-height: 60px;">
+          Lade Bestenliste...
+        </div>
+
+        <button class="kuka-btn big" onclick="game.restart()">NEUSTART</button>
+      </div>
+    </div>
+
+    <!-- Overlay: Registration (First Start) -->
+    <div id="overlay-register" class="game-overlay">
+      <div class="overlay-box">
+        <h2 class="go-title" style="color:var(--kuka-orange); margin-bottom: 20px;">SPIELEREINRICHTUNG</h2>
+        <p class="go-sub" style="margin-bottom: 30px;">Bitte trage deinen Namen und deine Firma ein, um in der globalen
+          Bestenliste zu erscheinen.</p>
+
+        <div class="input-group">
+          <label for="input-playername">SPIELERNAME</label>
+          <input type="text" id="input-playername" placeholder="Dein Name oder Nickname" maxlength="20" />
+        </div>
+
+        <div class="input-group">
+          <label for="input-companyname">FIRMENNAME / TEAM</label>
+          <input type="text" id="input-companyname" placeholder="Deine Firma oder Team (max 8 Zeichen)" maxlength="8" />
+        </div>
+
+        <button id="btn-save-profile" class="kuka-btn big" style="width: 100%; margin-top: 25px;"
+          onclick="savePlayerProfile()">SPEICHERN & STARTEN</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Firebase App (the core Firebase SDK) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, query, orderBy, limit, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+
+    // Reale Firebase Konfiguration
+    const firebaseConfig = {
+      apiKey: "AIzaSyBK4ZuKw32nOh0gqGX7hIUi3Lo4wRVIJcU",
+      authDomain: "titan-tower.firebaseapp.com",
+      projectId: "titan-tower",
+      storageBucket: "titan-tower.firebasestorage.app",
+      messagingSenderId: "992717085672",
+      appId: "1:992717085672:web:7c9aba147acc614b0c225d"
+    };
+
+    // Firebase initialisieren
+    let app, db;
+    try {
+      app = initializeApp(firebaseConfig);
+      db = getFirestore(app);
+      console.log("Firebase erfolgreich initialisiert.");
+    } catch (e) {
+      console.error("Firebase Init Fehler:", e);
+    }
+
+    // Globale Verweise auf DB-Funktionen für script.js bereitstellen
+    window.dbSaveHighscore = async function (playerName, company, score, parts, timeSec) {
+      if (!db) return;
+
+      try {
+        // Aktuellen Lauf in Firestore speichern
+        const docRef = await addDoc(collection(db, "highscores"), {
+          player: playerName,
+          company: company,
+          score: score,
+          parts: parts,
+          time: timeSec,
+          timestamp: serverTimestamp()
+        });
+        console.log("Score in Firebase gespeichert mit ID: ", docRef.id);
+
+        // Nach dem Speichern sofort die Top 3 laden und anzeigen
+        window.dbLoadTopScores();
+      } catch (e) {
+        console.error("Fehler beim Speichern des Scores in Firebase: ", e);
+      }
+    };
+
+    // Top 3 Scores laden für das Game-Over Overlay
+    window.dbLoadTopScores = async function () {
+      if (!db) return;
+
+      const listContainer = document.getElementById('global-highscores-list');
+      if (!listContainer) return;
+
+      try {
+        listContainer.innerHTML = "Lade Bestenliste...";
+
+        // Abfrage: Die 3 höchsten Scores (absteigend sortiert)
+        const q = query(collection(db, "highscores"), orderBy("score", "desc"), limit(3));
+        const querySnapshot = await getDocs(q);
+
+        let html = "";
+        let rank = 1;
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          let cName = data.company || "Unbekannt";
+          let pName = data.player || "Anonym";
+          // Firmennamen auf 8 Zeichen beschränken (falls manipuliert)
+          cName = cName.substring(0, 8).toUpperCase();
+
+          html += `<div class="stat-row" style="color: ${rank === 1 ? '#4cff72' : 'var(--light2)'}">
+            <span>${rank}. ${pName} [${cName}]</span>
+            <span>${data.score}</span>
+          </div>`;
+          rank++;
+        });
+
+        if (html === "") {
+          listContainer.innerHTML = "Noch keine Einträge vorhanden.";
+        } else {
+          listContainer.innerHTML = html;
+        }
+      } catch (e) {
+        console.error("Fehler beim Laden der Highscores:", e);
+        listContainer.innerHTML = "<span style='color:#ff4444'>Bestenliste konnte nicht geladen werden.</span>";
+      }
+    }
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+  <script src="script.js?v=5"></script>
+  <script>
+      // ===== AUTO-SCALE: 1920×1080 auf Fenstergröße skalieren =====
+      (function () {
+        const GAME_W = 1920, GAME_H = 1080;
+        const wrapper = document.getElementById('game-wrapper');
+        function scaleGame() {
+          const scaleX = window.innerWidth / GAME_W;
+          const scaleY = window.innerHeight / GAME_H;
+          const scale = Math.min(scaleX, scaleY);        // Aspect-Ratio bewahren
+          const offX = Math.round((window.innerWidth - GAME_W * scale) / 2);
+          const offY = Math.round((window.innerHeight - GAME_H * scale) / 2);
+          wrapper.style.transform = `translate(${offX}px, ${offY}px) scale(${scale})`;
+        }
+        window.addEventListener('resize', scaleGame);
+        scaleGame();
+      })();
+  </script>
+</body>
+
+</html>
