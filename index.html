@@ -11,7 +11,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700;900&family=Share+Tech+Mono&display=swap"
     rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=38" />
+  <link rel="stylesheet" href="style.css?v=41" />
   <link rel="manifest" href="manifest.json" />
 
   <!-- iOS PWA Meta Tags -->
@@ -295,7 +295,7 @@
   </script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
-  <script src="script.js?v=42"></script>
+  <script src="script.js?v=45"></script>
   <script>
     (function () {
       const GAME_W = 1920, GAME_H = 1080;
@@ -307,18 +307,21 @@
         const vw = vv ? vv.width : window.innerWidth;
         const vh = vv ? vv.height : window.innerHeight;
 
-        // Im Hochformat Skalierung deaktivieren, damit Warnmeldung groß bleibt
+        // 1. Hochformat-Check (Immer unskaliert für Warnmeldung)
         if (vh > vw) {
           wrapper.style.transform = 'none';
+          wrapper.style.left = '0';
+          wrapper.style.top = '0';
           return;
         }
 
-        // NEU: Wenn ein Input-Feld fokussiert ist, stoppen wir das automatische Re-Scaling,
-        // damit die Tastatur das Layout nicht "zerquetscht".
+        // 2. Querformat-Logik
+        wrapper.style.left = '0';
+        wrapper.style.top = '0';
+
         const activeEl = document.activeElement;
         const isInputActive = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA');
         
-        // CSS Klasse für das Overlay setzen (zum Ausblenden von Elementen auf Mobile)
         const regOverlay = document.getElementById('overlay-register');
         if (regOverlay) {
           if (isInputActive) regOverlay.classList.add('keyboard-active');
@@ -326,18 +329,18 @@
         }
 
         let scale;
-        if (isInputActive && !force) {
-          // Beim Tippen behalten wir die Skalierung bei, damit nichts schrumpft
+        // WICHTIG: Wenn wir KEINEN guten gespeicherten Scale haben (Initialstart im Hochformat),
+        // berechnen wir ihn IMMER neu, auch wenn ein Input aktiv ist.
+        if (isInputActive && !force && lastGoodScale !== 1) {
           scale = lastGoodScale;
         } else {
           scale = Math.min(vw / GAME_W, vh / GAME_H);
-          lastGoodScale = scale;
+          lastGoodScale = scale; // Den neuen, echten Wert für später merken
         }
 
         const offX = Math.round((vw - GAME_W * scale) / 2);
-        
-        // Wenn Input aktiv, fixieren wir das Overlay oben
         let offY = Math.round((vh - GAME_H * scale) / 2);
+        
         if (isInputActive && vh < 600) {
           offY = 10; 
         }
