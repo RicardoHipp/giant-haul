@@ -43,18 +43,14 @@ window.savePlayerProfile = function () {
 
 // Überprüfen, welches Overlay beim Start gezeigt werden soll
 function checkPlayerProfile() {
-  if (!globalPlayerName) {
-    // Kein Spielername -> Zeige Registrierung, verstecke Start
-    document.getElementById('overlay-start').classList.add('hidden');
-    document.getElementById('overlay-register').classList.remove('hidden');
-  } else {
-    // Profil existiert -> Zeige normalen Startbildschirm
-    document.getElementById('overlay-register').classList.add('hidden');
-    document.getElementById('overlay-start').classList.remove('hidden');
+  // Zeige IMMER die Registrierung beim ersten Laden der Seite
+  document.getElementById('overlay-start').classList.add('hidden');
+  document.getElementById('overlay-register').classList.remove('hidden');
 
-    // Felder trotzdem vorbefüllen (falls der Spieler sich umentscheidet via Console o.ä.)
+  if (globalPlayerName) {
+    // Profil existiert -> Felder vorbefüllen
     document.getElementById('input-playername').value = globalPlayerName;
-    document.getElementById('input-companyname').value = globalCompanyName;
+    document.getElementById('input-companyname').value = globalCompanyName === 'KUKA' ? '' : globalCompanyName;
 
     updateCompanyBranding();
   }
