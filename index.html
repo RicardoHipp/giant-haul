@@ -63,7 +63,7 @@
 
     // Version unter Vollbild-Button
     window.addEventListener('load', () => {
-      const vHtml = `<div style="font-size: 16px; color: rgba(255,255,255,0.7); font-family: 'Share Tech Mono', monospace; margin-top: 12px; letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.8);">BUILD: ${APP_VERSION}</div>`;
+      const vHtml = `<div style="font-size: 32px; color: rgba(255,255,255,0.7); font-family: 'Share Tech Mono', monospace; margin-top: 12px; letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.8);">B:${APP_VERSION}</div>`;
       document.querySelectorAll('.btn-fullscreen-external').forEach(btn => {
         const wrapper = document.createElement('div');
         wrapper.style.position = 'absolute'; wrapper.style.left = '4%'; wrapper.style.top = '50%';
