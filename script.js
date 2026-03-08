@@ -452,7 +452,7 @@ class Truck {
     this.totalW = this.CAB_W + this.PLAT_W;
     this.x = cw + 20;
     this.targetX = Math.round((cw - this.totalW) / 2);
-    this.state = 'incoming'; this.speed = 460;
+    this.state = 'incoming'; this.speed = 800;
   }
   get platformLeft() { return this.x + this.CAB_W; }
   get platformRight() { return this.x + this.CAB_W + this.PLAT_W; }
