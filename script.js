@@ -98,7 +98,7 @@ const CFG = {
   ROBOT_W: 90,
   ROBOT_H: 60,
   GRIPPER_H: 18,
-  BASE_SPEED: 180,
+  BASE_SPEED: 555,
   SPEED_INC: 12,
   MAX_SPEED: 1000,
   BLOCK_TYPES: [
@@ -618,6 +618,8 @@ class GiantTower {
     this.truckParts = 0; this.trucksLoaded = 0; this.partsTotal = 0;
 
     this.robot = null; this.truck = null;
+    this.targetSpeed = CFG.BASE_SPEED;
+    this.isLowKeyPressed = false;
     this.activeBlock = null;   // hängt am Greifer
     this.physicsBlocks = [];   // alle Blöcke in Matter.js-Simulation
     this.particles = [];
@@ -661,6 +663,11 @@ class GiantTower {
       if (e.code === 'Enter') { e.preventDefault(); this.sendTruck(); }
       if (e.code === 'KeyW') { e.preventDefault(); this._adjustSpeed(+30); }
       if (e.code === 'KeyS') { e.preventDefault(); this._adjustSpeed(-30); }
+      if (e.code === 'KeyL') { this.isLowKeyPressed = true; }
+    });
+
+    window.addEventListener('keyup', e => {
+      if (e.code === 'KeyL') { this.isLowKeyPressed = false; }
     });
 
     // Rechtsklick auf das gesamte Fenster = LKW abschicken
@@ -794,7 +801,9 @@ class GiantTower {
     this.activeBlock = null; this.physicsBlocks = []; this.particles = [];
     this.state = 'playing';
 
+    this.targetSpeed = CFG.BASE_SPEED;
     this.robot = new Robot(this.railY, this.cw);
+    this.robot.speed = CFG.BASE_SPEED;
     this.truck = new Truck(this.cw, this.floorY);
     Audio.startTruckEngine();
 
@@ -829,11 +838,17 @@ class GiantTower {
   // --- Roboter-Geschwindigkeit anpassen (Mausrad / W-S / Buttons) ---
   _adjustSpeed(delta) {
     if (!this.robot) return;
-    this.robot.speed = Math.max(60, Math.min(CFG.MAX_SPEED, this.robot.speed + delta));
+    this.targetSpeed = Math.max(60, Math.min(CFG.MAX_SPEED, this.targetSpeed + delta));
+
+    // Falls L nicht gedrückt ist, Roboter-Speed sofort mitziehen für direktes Feedback
+    if (!this.isLowKeyPressed) {
+      this.robot.speed = this.targetSpeed;
+    }
+
     // Speed-Anzeige kurz aufblitzen lassen
     const el = document.getElementById('speed-value');
     if (el) {
-      el.textContent = Math.round(this.robot.speed);
+      el.textContent = Math.round(this.targetSpeed);
       el.classList.add('flash');
       clearTimeout(this._speedFlashTimer);
       this._speedFlashTimer = setTimeout(() => el.classList.remove('flash'), 500);
@@ -926,7 +941,7 @@ class GiantTower {
     Audio.stopServo();
     Audio.stopAmb();
 
-    const score = Math.round(this.truckParts * this.truckParts * 100 / Math.max(this.loadingTime, 1));
+    const score = Math.round(this.truckParts * this.truckParts * 250 / (10 + Math.sqrt(Math.max(this.loadingTime, 1)) * 5));
     this.score = score;
     const isMission = title === 'MISSION COMPLETE';
     // Highscore nur bei erfolgreichem Abliefern zählen
@@ -958,9 +973,9 @@ class GiantTower {
   _triggerTruckLeave() {
     if (this.truck.state !== 'loading') return;
 
-    // Punkte live berechnen und anzeigen
+    // Punkte live berechnen und anzeigen (Teile² * 250) / (10 + Math.sqrt(Zeit) * 5)
     const timeSec = Math.max(this.loadingTime, 1);
-    const earned = Math.round(this.truckParts * this.truckParts * 100 / timeSec);
+    const earned = Math.round(this.truckParts * this.truckParts * 250 / (10 + Math.sqrt(timeSec) * 5));
     this.score = earned;
     this.trucksLoaded++;
     this.activeBlock = null;
@@ -1020,13 +1035,31 @@ class GiantTower {
     }
     if (this.state !== 'playing') return;
 
+    // Geschwindigkeits-Rampe (1600 px/s²)
+    if (this.robot) {
+      if (this.isLowKeyPressed) {
+        // Bremsen
+        this.robot.speed = Math.max(60, this.robot.speed - 1600 * dt);
+      } else {
+        // Beschleunigen auf Zielgeschwindigkeit
+        if (this.robot.speed < this.targetSpeed) {
+          this.robot.speed = Math.min(this.targetSpeed, this.robot.speed + 1600 * dt);
+        } else if (this.robot.speed > this.targetSpeed) {
+          this.robot.speed = Math.max(this.targetSpeed, this.robot.speed - 1600 * dt);
+        }
+      }
+      // Live-Anzeige aktualisieren
+      const sv = document.getElementById('speed-value');
+      if (sv) sv.textContent = Math.round(this.robot.speed);
+    }
+
     // Ladezeit-Timer + Live-Score-Berechnung
     if (this.truck && this.truck.state === 'loading' && this.loadingStarted) {
       this.loadingTime += dt;
       document.getElementById('hud-level').textContent = Math.round(this.loadingTime) + 's';
-      // Live-Punkte: Teile² × 100 / Zeit → sinkt mit der Zeit, steigt mit Teilen
+      // Live-Punkte: (Teile² * 250) / (10 + Math.sqrt(Zeit) * 5)
       const liveScore = this.truckParts > 0
-        ? Math.round(this.truckParts * this.truckParts * 100 / Math.max(this.loadingTime, 1))
+        ? Math.round(this.truckParts * this.truckParts * 250 / (10 + Math.sqrt(Math.max(this.loadingTime, 1)) * 5))
         : 0;
       document.getElementById('hud-score').textContent = liveScore;
     }
