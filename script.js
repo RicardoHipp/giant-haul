@@ -1,6 +1,6 @@
 /* ===================================================================
    TITAN HAUL – script.js
-   COMPANY KR TITAN | LKW-Beladespiel | Matter.js Rigid-Body-Physik
+   COMPANY Schwerlast-Roboter | LKW-Beladespiel | Matter.js Rigid-Body-Physik
    =================================================================== */
 'use strict';
 
@@ -576,8 +576,28 @@ class TitanTower {
     // Prüfen, ob der Spieler schon registriert ist
     checkPlayerProfile();
 
-    // Kein Resize-Listener – feste Spielgröße 800×600
-    this.canvas.addEventListener('click', () => this._inputDrop());
+    // Klick auf das gesamte Fenster zum Abwerfen (erlaubt Klicks im schwarzen Rand)
+    const handleInput = (e) => {
+      // Ignoriere Klicks auf UI-Elemente
+      if (e.target.closest('button') || e.target.closest('.overlay-box') || e.target.closest('.smartpad-panel') || e.target.closest('#speed-panel') || e.target.closest('.input-group')) return;
+      
+      // Position des Klicks/Touch bestimmen
+      const x = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+      
+      // NEU: Wenn der Touch/Klick im linken Bereich ist (Speed-Zone), kein Abwurf!
+      // Das erlaubt das Wischen links, ohne dass eine Kiste fällt.
+      if (x < window.innerWidth * 0.35) return;
+
+      this._inputDrop();
+    };
+
+    window.addEventListener('pointerdown', handleInput);
+    // Zusätzlicher Touch-Listener für ältere iOS Versionen
+    window.addEventListener('touchstart', (e) => {
+      if (e.touches.length > 1) return; // Multi-Touch ignorieren
+      handleInput(e);
+    }, { passive: true });
+
     window.addEventListener('keydown', e => {
       // Ignoriere Tasteneingaben, wenn der User in ein Input-Feld tippt
       if (['INPUT', 'TEXTAREA'].includes(e.target.tagName)) return;
@@ -587,13 +607,58 @@ class TitanTower {
       if (e.code === 'KeyW') { e.preventDefault(); this._adjustSpeed(+30); }
       if (e.code === 'KeyS') { e.preventDefault(); this._adjustSpeed(-30); }
     });
-    // Rechtsklick = LKW abschicken
-    this.canvas.addEventListener('contextmenu', e => { e.preventDefault(); this.sendTruck(); });
-    // Mausrad = Geschwindigkeit
-    this.canvas.addEventListener('wheel', e => {
+
+    // Rechtsklick auf das gesamte Fenster = LKW abschicken
+    window.addEventListener('contextmenu', e => {
+      // Ignoriere UI
+      if (e.target.closest('button') || e.target.closest('.overlay-box')) return;
+      e.preventDefault(); 
+      this.sendTruck(); 
+    });
+
+    // Mausrad = Geschwindigkeit (bleibt am Fenster)
+    window.addEventListener('wheel', e => {
       e.preventDefault();
       this._adjustSpeed(e.deltaY < 0 ? +30 : -30);
     }, { passive: false });
+
+    // --- TOUCH WIPING FÜR SPEED CONTROL (Linke Bildschirmseite) ---
+    let touchStartY = null;
+    let touchStartX = null;
+    let lastTouchY = null;
+
+    window.addEventListener('touchstart', e => {
+      // Prüfen, ob Touch im linken Drittel des Bildschirms gestartet ist
+      const touchX = e.touches[0].clientX;
+      if (touchX < window.innerWidth * 0.35) {
+        touchStartY = e.touches[0].clientY;
+        touchStartX = touchX;
+        lastTouchY = touchStartY;
+      } else {
+        touchStartY = null; // Ignorieren, ist Kisten-Wurf
+      }
+    }, { passive: true });
+
+    window.addEventListener('touchmove', e => {
+      if (touchStartY === null) return;
+
+      const currentY = e.touches[0].clientY;
+      const currentX = e.touches[0].clientX;
+      const deltaY = lastTouchY - currentY;
+
+      // Nur reagieren, wenn vertikaler Wisch (nicht zu viel zur Seite abgedriftet)
+      if (Math.abs(touchStartX - currentX) < 80) {
+        // Schwellenwert: Alle 10 Pixel Wischen = Speed-Änderung
+        if (Math.abs(deltaY) > 10) {
+          // Wischen nach Oben (deltaY positiv) = deutlich schneller (30 anstatt 10)
+          this._adjustSpeed(deltaY > 0 ? +30 : -30);
+          lastTouchY = currentY; // Referenzpunkt für nächste Änderung setzen
+        }
+      } else {
+        touchStartY = null; // Wischen abgebrochen
+      }
+    }, { passive: true });
+
     document.querySelectorAll('.company-btn').forEach(b => b.addEventListener('mousedown', () => Audio.playClick()));
 
     this._lastTime = null;
