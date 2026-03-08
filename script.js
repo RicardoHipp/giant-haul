@@ -21,11 +21,14 @@ function updateCompanyBranding() {
 
 // Wird beim Klick auf "Speichern & Starten" im Overlay aufgerufen
 window.savePlayerProfile = function () {
-  const nameInput = document.getElementById('input-playername').value.trim();
-  const compInput = document.getElementById('input-companyname').value.trim();
+  const nameInputEl = document.getElementById('input-playername');
+  const compInputEl = document.getElementById('input-companyname');
+  const nameInput = nameInputEl.value.trim();
+  const compInput = compInputEl.value.trim();
 
   if (!nameInput) {
     alert("Bitte gib einen Spielernamen ein.");
+    nameInputEl.focus();
     return;
   }
 
@@ -41,6 +44,22 @@ window.savePlayerProfile = function () {
   document.getElementById('overlay-start').classList.remove('hidden');
 };
 
+// Event-Listener für Enter-Taste in den Eingabefeldern
+document.addEventListener('DOMContentLoaded', () => {
+  const inputs = ['input-playername', 'input-companyname'];
+  inputs.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          window.savePlayerProfile();
+        }
+      });
+    }
+  });
+});
+
 // Überprüfen, welches Overlay beim Start gezeigt werden soll
 function checkPlayerProfile() {
   // Lade Bestenliste beim Spielstart
@@ -52,13 +71,21 @@ function checkPlayerProfile() {
   document.getElementById('overlay-start').classList.add('hidden');
   document.getElementById('overlay-register').classList.remove('hidden');
 
+  const pInput = document.getElementById('input-playername');
+  const cInput = document.getElementById('input-companyname');
+
   if (globalPlayerName) {
     // Profil existiert -> Felder vorbefüllen
-    document.getElementById('input-playername').value = globalPlayerName;
-    document.getElementById('input-companyname').value = globalCompanyName;
+    pInput.value = globalPlayerName;
+    cInput.value = globalCompanyName;
 
     updateCompanyBranding();
   }
+
+  // Auto-Fokus auf das Namensfeld (mit leichter Verzögerung für Mobile-Browser)
+  setTimeout(() => {
+    if (pInput) pInput.focus();
+  }, 300);
 }
 
 // ===================================================================

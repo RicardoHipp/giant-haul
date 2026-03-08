@@ -306,23 +306,65 @@ body {
   box-shadow: 0 2px 0 #7a3510, 0 4px 15px rgba(243, 112, 33, .4);
 }
 
+/* Standard: Desktop-Anleitung zeigen, Mobile verstecken */
+.instr-desktop { display: block; }
+.instr-mobile { display: none; }
+
 /* Auf mobilen Displays die Overlay-Box größer machen und Button anpassen */
 @media (max-width: 1000px) and (max-height: 600px) {
+  /* Mobile-Anleitung zeigen, Desktop verstecken */
+  .instr-desktop { display: none; }
+  .instr-mobile { display: block; }
+
   .overlay-box {
     animation: overlayPopMobile .35s cubic-bezier(.22, 1.5, .5, 1) forwards;
     /* Box etwas nach rechts, damit der Button Platz hat */
     position: relative;
     left: 80px;
+    padding: 20px 30px; /* Weniger Padding, mehr Platz für Inhalt */
+    width: 85%;
+    max-width: 500px;
+  }
+
+  /* Speziell für die Namenseingabe: Größere Texte */
+  .input-group label {
+    font-size: 16px;
+  }
+  .input-group input {
+    font-size: 22px;
+    padding: 16px;
+  }
+  .go-title {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+  .go-sub {
+    font-size: 12px;
+    margin-bottom: 10px !important;
+  }
+  
+  /* Bestenliste auf Mobile wieder einblenden, aber kompakt */
+  #start-highscores-list {
+    display: block; 
+    margin-bottom: 10px;
+    max-height: 120px;
+    overflow-y: auto;
+  }
+
+  /* Diese Klasse wird per JS gesetzt, wenn die Tastatur offen ist */
+  .keyboard-active #start-highscores-list,
+  .keyboard-active .go-sub,
+  .keyboard-active .overlay-logo {
+    display: none;
   }
 
   @keyframes overlayPopMobile {
     from {
-      transform: scale(1.2);
+      transform: scale(1.0); /* Nicht mehr so extrem skalieren */
       opacity: 0;
     }
-
     to {
-      transform: scale(1.6);
+      transform: scale(1.4);
       opacity: 1;
     }
   }
@@ -448,21 +490,25 @@ kbd {
 
 .input-group input {
   width: 100%;
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px solid var(--dark3);
-  border-radius: 6px;
-  padding: 12px 14px;
+  background: rgba(0, 0, 0, 0.6);
+  border: 2px solid var(--dark3);
+  border-radius: 8px;
+  padding: 14px 16px;
   color: #fff;
   font-family: 'Roboto Condensed', sans-serif;
-  font-size: 16px;
+  font-size: 18px; /* Slightly larger for better readability */
   font-weight: 700;
   outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+  box-sizing: border-box;
+  -webkit-appearance: none; /* Avoid iOS default styling */
 }
 
 .input-group input:focus {
   border-color: var(--company-orange);
-  box-shadow: 0 0 10px rgba(243, 112, 33, 0.3);
+  box-shadow: 0 0 15px rgba(243, 112, 33, 0.4);
+  background: rgba(0, 0, 0, 0.8);
+  transform: translateY(-1px);
 }
 
 .input-group input::placeholder {
