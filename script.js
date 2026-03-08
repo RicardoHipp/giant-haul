@@ -573,6 +573,9 @@ class TitanTower {
     // Kein Resize-Listener – feste Spielgröße 800×600
     this.canvas.addEventListener('click', () => this._inputDrop());
     window.addEventListener('keydown', e => {
+      // Ignoriere Tasteneingaben, wenn der User in ein Input-Feld tippt
+      if (['INPUT', 'TEXTAREA'].includes(e.target.tagName)) return;
+
       if (e.code === 'Space') { e.preventDefault(); this._inputDrop(); }
       if (e.code === 'Enter') { e.preventDefault(); this.sendTruck(); }
       if (e.code === 'KeyW') { e.preventDefault(); this._adjustSpeed(+30); }
