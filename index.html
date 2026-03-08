@@ -115,7 +115,7 @@
         <!-- Globaler Highscore (Firebase) -->
         <h3
           style="color: var(--kuka-orange); font-size: 14px; margin-top: 15px; margin-bottom: 5px; text-transform: uppercase;">
-          TOP 3 WELTWEIT</h3>
+          TOP 10 WELTWEIT</h3>
         <div id="global-highscores-list" class="go-stats"
           style="font-size: 12px; margin-bottom: 20px; min-height: 60px;">
           Lade Bestenliste...
@@ -207,8 +207,8 @@
       try {
         listContainer.innerHTML = "Lade Bestenliste...";
 
-        // Abfrage: Die 3 höchsten Scores (absteigend sortiert)
-        const q = query(collection(db, "highscores"), orderBy("score", "desc"), limit(3));
+        // Abfrage: Die 10 höchsten Scores (absteigend sortiert)
+        const q = query(collection(db, "highscores"), orderBy("score", "desc"), limit(10));
         const querySnapshot = await getDocs(q);
 
         let html = "";
