@@ -1,4 +1,4 @@
-// Version: 1.0.25
+// Version: 1.0.29
 // Importiert die zentrale Versionsnummer
 importScripts('version.js');
 

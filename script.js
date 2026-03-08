@@ -222,7 +222,35 @@ const Audio = (() => {
     try { ambNode.stop(); } catch (e) { }
     ambNode = null;
   }
-  return { startServo, stopServo, setServoFreq, playGripper, playImpact, playPing, playTruckHorn, playClick, startAmb, stopAmb };
+  let truckEngineNode = null, truckEngineGain = null;
+  function startTruckEngine() {
+    if (truckEngineNode) return;
+    const c = getCtx(), t = c.currentTime;
+    truckEngineGain = c.createGain(); truckEngineGain.gain.value = 0; truckEngineGain.connect(c.destination);
+    const o1 = c.createOscillator(); o1.type = 'sawtooth'; o1.frequency.value = 54;
+    const o2 = c.createOscillator(); o2.type = 'sawtooth'; o2.frequency.value = 56;
+    const f = c.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 180;
+    o1.connect(f); o2.connect(f); f.connect(truckEngineGain);
+    o1.start(); o2.start(); truckEngineNode = o1;
+    truckEngineGain.gain.setTargetAtTime(0.12, t, 0.3);
+  }
+  function stopTruckEngine(withSqueal = false) {
+    if (!truckEngineGain) return;
+    const c = getCtx(), t = c.currentTime;
+    truckEngineGain.gain.setTargetAtTime(0, t, 0.2);
+    setTimeout(() => { if (truckEngineNode) { try { truckEngineNode.stop(); } catch (e) { } truckEngineNode = null; truckEngineGain = null; } }, 300);
+    
+    if (withSqueal) {
+      const sSrc = c.createBufferSource(); sSrc.buffer = noise();
+      const sG = c.createGain(); sG.gain.setValueAtTime(0, t);
+      sG.gain.linearRampToValueAtTime(0.04, t + 0.05);
+      sG.gain.exponentialRampToValueAtTime(0.001, t + 0.6);
+      const sF = c.createBiquadFilter(); sF.type = 'bandpass'; sF.frequency.value = 4500; sF.Q.value = 5;
+      sSrc.connect(sF); sF.connect(sG); sG.connect(c.destination);
+      sSrc.start(t); sSrc.stop(t + 0.7);
+    }
+  }
+  return { startServo, stopServo, setServoFreq, playGripper, playImpact, playPing, playTruckHorn, playClick, startAmb, stopAmb, startTruckEngine, stopTruckEngine };
 })();
 
 // ===================================================================
@@ -764,6 +792,7 @@ class TitanTower {
 
     this.robot = new Robot(this.railY, this.cw);
     this.truck = new Truck(this.cw, this.floorY);
+    Audio.startTruckEngine();
 
     this._buildStaticBodies();
 
@@ -890,8 +919,8 @@ class TitanTower {
 
   // --- Ergebnis-Overlay (Game Over oder LKW abgeschickt) ---
   _showResultOverlay(title, subtitle, delay) {
-    Audio.stopServo(); // Stop engine sound
-    Audio.stopAmb();  // Stop background ambient
+    Audio.stopServo();
+    Audio.stopAmb(); 
 
     const score = Math.round(this.truckParts * this.truckParts * 100 / Math.max(this.loadingTime, 1));
     this.score = score;
@@ -900,6 +929,7 @@ class TitanTower {
     if (isMission && this.score > this.highscore) this.highscore = this.score;
 
     setTimeout(() => {
+      Audio.stopTruckEngine();
       const icon = document.getElementById('go-icon');
       const titleEl = document.getElementById('go-title');
       if (icon) { icon.textContent = isMission ? '✅' : '⚠'; icon.style.textShadow = isMission ? '0 0 20px #4cff72' : '0 0 20px #ff4444'; }
@@ -941,6 +971,7 @@ class TitanTower {
 
     Audio.stopServo();
     this.truck.state = 'leaving';
+    Audio.startTruckEngine();
     Audio.playTruckHorn();
 
     // FIREBASE HIGHSCORE SPEICHERN
@@ -1006,6 +1037,7 @@ class TitanTower {
     // LKW gerade angekommen → Physik-Platform aufbauen, Roboter + neuen Block starten
     if (prevState === 'incoming' && this.truck.state === 'loading') {
       this._buildTruckBody();
+      Audio.stopTruckEngine(true);
       Audio.startServo();
       this.physicsBlocks = [];
       this.truckParts = 0;
