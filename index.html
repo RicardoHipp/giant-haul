@@ -11,7 +11,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700;900&family=Share+Tech+Mono&display=swap"
     rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=31" />
+  <link rel="stylesheet" href="style.css?v=32" />
   <link rel="manifest" href="manifest.json" />
 
   <!-- iOS PWA Meta Tags -->
@@ -23,26 +23,25 @@
 <body>
   <script src="version.js"></script>
   <script>
-    // HARD RESET 1.0.40
-    if (localStorage.getItem('force_reset_1.0.40') !== 'done') {
+    // HARD RESET 1.0.41
+    if (localStorage.getItem('force_reset_1.0.41') !== 'done') {
       if ('serviceWorker' in navigator) {
         caches.keys().then(names => { for (let name of names) caches.delete(name); });
         navigator.serviceWorker.getRegistrations().then(regs => { for (let r of regs) r.unregister(); });
       }
-      localStorage.setItem('force_reset_1.0.40', 'done');
+      localStorage.setItem('force_reset_1.0.41', 'done');
       setTimeout(() => window.location.reload(true), 500);
     }
     // Service Worker registrieren
     if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
       window.addEventListener('load', () => {
-        // Nutze die feste Version statt Date.now(), um Endlosschleifen zu verhindern
-        const swUrl = 'sw.js?v=' + APP_VERSION;
-        navigator.serviceWorker.register(swUrl).then(reg => {
+        // KEIN Query-Parameter bei sw.js, da dies zu Endlosschleifen führen kann!
+        navigator.serviceWorker.register('sw.js').then(reg => {
           reg.onupdatefound = () => {
             const w = reg.installing;
             w.onstatechange = () => {
               if (w.state === 'installed' && navigator.serviceWorker.controller) {
-                // Silent Update: Sofort installieren ohne Nachfrage
+                // Silent Update: Sofort installieren
                 w.postMessage('skipWaiting');
               }
             };
@@ -50,7 +49,7 @@
         });
       });
 
-      // Seite nur einmal neu laden, wenn der neue Worker übernimmt
+      // Seite nur neu laden, wenn ein neuer Worker ein Update durchgeführt hat
       let refreshing = false;
       navigator.serviceWorker.addEventListener('controllerchange', () => {
         if (refreshing) return;
@@ -293,7 +292,7 @@
   </script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
-  <script src="script.js?v=34"></script>
+  <script src="script.js?v=35"></script>
   <script>
     (function () {
       const GAME_W = 1920, GAME_H = 1080;
