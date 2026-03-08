@@ -673,6 +673,10 @@ class TitanTower {
 
     // Mausrad = Geschwindigkeit (bleibt am Fenster)
     window.addEventListener('wheel', e => {
+      // Wenn das Handbuch offen ist, erlauben wir das Scrollen
+      const manual = document.getElementById('overlay-manual');
+      if (manual && !manual.classList.contains('hidden')) return;
+
       e.preventDefault();
       this._adjustSpeed(e.deltaY < 0 ? +30 : -30);
     }, { passive: false });
