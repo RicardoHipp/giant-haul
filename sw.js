@@ -1,4 +1,4 @@
-// Version: 1.0.18
+// Version: 1.0.19
 // Importiert die zentrale Versionsnummer
 importScripts('version.js');
 
@@ -12,6 +12,13 @@ const ASSETS = [
   'https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700;900&family=Share+Tech+Mono&display=swap',
   'https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js'
 ];
+
+// Sofort aktivieren, wenn die App es anfordert
+self.addEventListener('message', (event) => {
+  if (event.data === 'skipWaiting') {
+    self.skipWaiting();
+  }
+});
 
 // Install Event
 self.addEventListener('install', (event) => {

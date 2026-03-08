@@ -23,13 +23,13 @@
 <body>
   <script src="version.js"></script>
   <script>
-    // HARD RESET 1.0.18
-    if (localStorage.getItem('force_reset_1.0.18') !== 'done') {
+    // HARD RESET 1.0.19
+    if (localStorage.getItem('force_reset_1.0.19') !== 'done') {
       if ('serviceWorker' in navigator) {
         caches.keys().then(names => { for (let name of names) caches.delete(name); });
         navigator.serviceWorker.getRegistrations().then(regs => { for (let r of regs) r.unregister(); });
       }
-      localStorage.setItem('force_reset_1.0.18', 'done');
+      localStorage.setItem('force_reset_1.0.19', 'done');
       setTimeout(() => window.location.reload(true), 500);
     }
 
@@ -42,7 +42,11 @@
             const w = reg.installing;
             w.onstatechange = () => {
               if (w.state === 'installed' && navigator.serviceWorker.controller) {
-                if (confirm("Update verfügbar (v" + APP_VERSION + ")! Jetzt laden?")) window.location.reload();
+                if (confirm("Update verfügbar (v" + APP_VERSION + ")! Jetzt laden?")) {
+                  // Dem neuen Worker sagen, er soll sofort übernehmen
+                  w.postMessage('skipWaiting');
+                  window.location.reload();
+                }
               }
             };
           };
