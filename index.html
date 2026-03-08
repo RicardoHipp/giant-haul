@@ -11,7 +11,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700;900&family=Share+Tech+Mono&display=swap"
     rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=34" />
+  <link rel="stylesheet" href="style.css?v=35" />
   <link rel="manifest" href="manifest.json" />
 
   <!-- iOS PWA Meta Tags -->
@@ -21,25 +21,40 @@
 </head>
 
 <body>
-  <script src="version.js"></script>
+  <!-- Cache-Buster für version.js, damit der Browser nicht die alte gecachte Datei liest -->
   <script>
-    // HARD UPDATE LOGIC
+    document.write('<script src="version.js?t=' + Date.now() + '"><\/script>');
+  </script>
+  <script>
+    // HARD UPDATE LOGIC WITH LOGGING
     (function() {
       const lastVersion = localStorage.getItem('titan_app_version');
+      console.log("[APP] Startvorgang... Version: " + APP_VERSION + " (Letzte bekannte: " + lastVersion + ")");
+      
       if (lastVersion && lastVersion !== APP_VERSION) {
-        // Bei Versionssprung alles löschen
+        console.warn("[APP] UPDATE ERKANNT! Bereinige Speicher...");
         if ('serviceWorker' in navigator) {
-          caches.keys().then(names => { for (let name of names) caches.delete(name); });
-          navigator.serviceWorker.getRegistrations().then(regs => { for (let r of regs) r.unregister(); });
+          caches.keys().then(names => { 
+            for (let name of names) {
+              console.log("[APP] Lösche Cache-Speicher: " + name);
+              caches.delete(name); 
+            }
+          });
+          navigator.serviceWorker.getRegistrations().then(regs => { 
+            for (let r of regs) {
+              console.log("[APP] Unregistriere ServiceWorker...");
+              r.unregister(); 
+            }
+          });
         }
         localStorage.setItem('titan_app_version', APP_VERSION);
-        setTimeout(() => window.location.reload(true), 300);
+        console.warn("[APP] HArter Reload wird ausgelöst...");
+        setTimeout(() => window.location.reload(true), 500);
         return;
       }
       localStorage.setItem('titan_app_version', APP_VERSION);
     })();
 
-    // Service Worker einfach registrieren (Network-First wird in sw.js geregelt)
     if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('sw.js');
@@ -280,7 +295,7 @@
   </script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
-  <script src="script.js?v=38"></script>
+  <script src="script.js?v=39"></script>
   <script>
     (function () {
       const GAME_W = 1920, GAME_H = 1080;

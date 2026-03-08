@@ -1,20 +1,18 @@
-// Version: 1.0.43
+// Version: 1.0.44
 importScripts('version.js');
 
 const CACHE_NAME = 'titan-haul-cache-v' + APP_VERSION;
 
-// Dateien, die für den Offline-Modus gespeichert werden
 const ASSETS = [
   'index.html',
   'style.css',
   'script.js',
   'manifest.json',
-  'version.js',
-  'https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700;900&family=Share+Tech+Mono&display=swap',
-  'https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js'
+  'version.js'
 ];
 
 self.addEventListener('install', (event) => {
+  console.log('[SW] Installiere neue Version: ' + APP_VERSION);
   self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
@@ -22,32 +20,44 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('activate', (event) => {
+  console.log('[SW] Aktiviere Version: ' + APP_VERSION);
   event.waitUntil(
     Promise.all([
       self.clients.claim(),
       caches.keys().then((keys) => {
         return Promise.all(
-          keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
+          keys.filter((key) => key !== CACHE_NAME).map((key) => {
+            console.log('[SW] Lösche alten Cache: ' + key);
+            return caches.delete(key);
+          })
         );
       })
     ])
   );
 });
 
-// RADIKALER NETWORK-FIRST ANSATZ
 self.addEventListener('fetch', (event) => {
+  // WICHTIG: Nur GET-Anfragen können gecacht werden!
+  // Firebase nutzt POST, das ignorieren wir hier komplett.
+  if (event.request.method !== 'GET') {
+    return; 
+  }
+
   event.respondWith(
     fetch(event.request)
       .then((response) => {
-        // Wenn Netzwerk erfolgreich, Kopie im Cache aktualisieren
-        const resClone = response.clone();
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, resClone);
-        });
+        // Wenn Netzwerk da, Cache aktualisieren
+        if (response.status === 200) {
+          const resClone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, resClone);
+          });
+        }
         return response;
       })
       .catch(() => {
-        // Nur wenn Netzwerk fehlschlägt (Offline), Cache nutzen
+        // Wenn Offline, Cache nutzen
+        console.log('[SW] Offline-Modus: Lade aus Cache: ' + event.request.url);
         return caches.match(event.request);
       })
   );
