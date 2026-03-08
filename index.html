@@ -23,34 +23,41 @@
 <body>
   <script src="version.js"></script>
   <script>
-    // HARD RESET 1.0.19
-    if (localStorage.getItem('force_reset_1.0.19') !== 'done') {
+    // HARD RESET 1.0.20
+    if (localStorage.getItem('force_reset_1.0.20') !== 'done') {
       if ('serviceWorker' in navigator) {
         caches.keys().then(names => { for (let name of names) caches.delete(name); });
         navigator.serviceWorker.getRegistrations().then(regs => { for (let r of regs) r.unregister(); });
       }
-      localStorage.setItem('force_reset_1.0.19', 'done');
+      localStorage.setItem('force_reset_1.0.20', 'done');
       setTimeout(() => window.location.reload(true), 500);
     }
 
     // Service Worker registrieren
     if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
       window.addEventListener('load', () => {
-        const swUrl = 'sw.js?v=' + Date.now();
+        // Nutze die feste Version statt Date.now(), um Endlosschleifen zu verhindern
+        const swUrl = 'sw.js?v=' + APP_VERSION;
         navigator.serviceWorker.register(swUrl).then(reg => {
           reg.onupdatefound = () => {
             const w = reg.installing;
             w.onstatechange = () => {
               if (w.state === 'installed' && navigator.serviceWorker.controller) {
                 if (confirm("Update verfügbar (v" + APP_VERSION + ")! Jetzt laden?")) {
-                  // Dem neuen Worker sagen, er soll sofort übernehmen
                   w.postMessage('skipWaiting');
-                  window.location.reload();
                 }
               }
             };
           };
         });
+      });
+
+      // Seite nur einmal neu laden, wenn der neue Worker übernimmt
+      let refreshing = false;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (refreshing) return;
+        refreshing = true;
+        window.location.reload();
       });
     }
 
