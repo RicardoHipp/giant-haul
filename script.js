@@ -50,7 +50,7 @@ function checkPlayerProfile() {
   if (globalPlayerName) {
     // Profil existiert -> Felder vorbefüllen
     document.getElementById('input-playername').value = globalPlayerName;
-    document.getElementById('input-companyname').value = globalCompanyName === 'KUKA' ? '' : globalCompanyName;
+    document.getElementById('input-companyname').value = globalCompanyName;
 
     updateCompanyBranding();
   }
