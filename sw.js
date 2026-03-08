@@ -1,4 +1,4 @@
-// Version: 1.0.41
+// Version: 1.0.42
 // Importiert die zentrale Versionsnummer
 importScripts('version.js');
 
@@ -13,34 +13,30 @@ const ASSETS = [
   'https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js'
 ];
 
-// Sofort aktivieren, wenn die App es anfordert
+self.addEventListener('install', (event) => {
+  self.skipWaiting(); // Zwingt den neuen SW, nicht auf das Schließen der Tabs zu warten
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
+  );
+});
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    Promise.all([
+      self.clients.claim(), // Übernimmt sofort die Kontrolle über alle offenen Tabs
+      caches.keys().then((keys) => {
+        return Promise.all(
+          keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
+        );
+      })
+    ])
+  );
+});
+
 self.addEventListener('message', (event) => {
   if (event.data === 'skipWaiting') {
     self.skipWaiting();
   }
-});
-
-// Install Event
-self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      console.log('Service Worker: Caching Assets (Version ' + APP_VERSION + ')');
-      return cache.addAll(ASSETS);
-    })
-  );
-  self.skipWaiting();
-});
-
-// Activate Event (Cleanup alter Caches)
-self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then((keys) => {
-      return Promise.all(
-        keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
-      );
-    })
-  );
-  self.clients.claim(); // Sofort die Kontrolle übernehmen
 });
 
 // Fetch Event (Network First für HTML, Cache First für andere Assets)

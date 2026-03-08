@@ -23,33 +23,37 @@
 <body>
   <script src="version.js"></script>
   <script>
-    // HARD RESET 1.0.41
-    if (localStorage.getItem('force_reset_1.0.41') !== 'done') {
-      if ('serviceWorker' in navigator) {
-        caches.keys().then(names => { for (let name of names) caches.delete(name); });
-        navigator.serviceWorker.getRegistrations().then(regs => { for (let r of regs) r.unregister(); });
+    // BULLETPROOF UPDATE LOGIC
+    (function() {
+      const lastVersion = localStorage.getItem('titan_app_version');
+      if (lastVersion && lastVersion !== APP_VERSION) {
+        console.log("New version detected: " + APP_VERSION + ". Purging cache...");
+        if ('serviceWorker' in navigator) {
+          caches.keys().then(names => { for (let name of names) caches.delete(name); });
+          navigator.serviceWorker.getRegistrations().then(regs => { for (let r of regs) r.unregister(); });
+        }
+        localStorage.setItem('titan_app_version', APP_VERSION);
+        // Kurze Verzögerung für Browser-Cleanup, dann harter Reload
+        setTimeout(() => window.location.reload(true), 200);
+        return;
       }
-      localStorage.setItem('force_reset_1.0.41', 'done');
-      setTimeout(() => window.location.reload(true), 500);
-    }
+      localStorage.setItem('titan_app_version', APP_VERSION);
+    })();
+
     // Service Worker registrieren
     if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
       window.addEventListener('load', () => {
-        // KEIN Query-Parameter bei sw.js, da dies zu Endlosschleifen führen kann!
         navigator.serviceWorker.register('sw.js').then(reg => {
           reg.onupdatefound = () => {
             const w = reg.installing;
             w.onstatechange = () => {
               if (w.state === 'installed' && navigator.serviceWorker.controller) {
-                // Silent Update: Sofort installieren
                 w.postMessage('skipWaiting');
               }
             };
           };
         });
       });
-
-      // Seite nur neu laden, wenn ein neuer Worker ein Update durchgeführt hat
       let refreshing = false;
       navigator.serviceWorker.addEventListener('controllerchange', () => {
         if (refreshing) return;
@@ -292,7 +296,7 @@
   </script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
-  <script src="script.js?v=35"></script>
+  <script src="script.js?v=36"></script>
   <script>
     (function () {
       const GAME_W = 1920, GAME_H = 1080;
