@@ -84,10 +84,16 @@
         <div class="overlay-logo company-name-display">KUKA</div>
         <h1 class="overlay-title">TITAN<br><span class="overlay-sub">HAUL</span></h1>
         <p class="overlay-desc">
-          Belade den LKW mit dem KR TITAN – so viele Kisten wie möglich!<br><br>
-          <kbd>SPACE</kbd> / Klick &nbsp;= Kiste abwerfen<br>
-          <kbd>ENTER</kbd> / Rechtsklick &nbsp;= LKW abschicken<br>
-          <kbd>W</kbd> / <kbd>S</kbd> / Mausrad &nbsp;= Roboter-Speed ±<br><br>
+          Belade den LKW mit dem KR TITAN – so viele Kisten wie möglich!
+        </p>
+        <div
+          style="background: rgba(243,112,33,0.12); border: 1px solid var(--kuka-orange); border-radius: 10px; padding: 16px 20px; margin: 14px 0; font-size: 18px; line-height: 2; font-family: 'Share Tech Mono', monospace; text-align: left; width: 100%; box-sizing: border-box;">
+          <kbd style="font-size:15px;">SPACE</kbd> / Klick &nbsp;= <strong>Kiste abwerfen</strong><br>
+          <kbd style="font-size:15px;">ENTER</kbd> / Rechtsklick &nbsp;= <strong>LKW abschicken</strong><br>
+          <kbd style="font-size:15px;">W</kbd> / <kbd style="font-size:15px;">S</kbd> / Mausrad &nbsp;=
+          <strong>Roboter-Speed ±</strong>
+        </div>
+        <p class="overlay-desc" style="font-size: 13px; margin-top: 0;">
           Roboter holt neue Kisten <strong>am Rand</strong> ab.<br>
           Fällt eine Kiste runter → Runde vorbei!<br>
           <small>Punkte = Teile² × 100 / Zeit</small>
@@ -113,14 +119,12 @@
         </div>
 
         <!-- Globaler Highscore (Firebase) -->
-        <div style="text-align: center;">
-          <h3
-            style="color: var(--kuka-orange); font-size: 14px; margin-top: 15px; margin-bottom: 5px; text-transform: uppercase;">
-            TOP 10 WELTWEIT</h3>
-          <div id="global-highscores-list" class="go-stats"
-            style="font-size: 12px; margin-bottom: 20px; min-height: 60px; text-align: left;">
-            Lade Bestenliste...
-          </div>
+        <div id="global-highscores-list" class="go-stats"
+          style="font-size: 12px; margin-bottom: 20px; min-height: 60px; margin-top: 15px;">
+          <div
+            style="text-align: center; color: var(--kuka-orange); font-size: 14px; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;">
+            TOP 10 WELTWEIT</div>
+          Lade Bestenliste...
         </div>
 
         <button class="kuka-btn big" onclick="game.restart()">NEUSTART</button>
@@ -130,18 +134,18 @@
     <!-- Overlay: Registration (First Start) -->
     <div id="overlay-register" class="game-overlay">
       <div class="overlay-box">
-        <h2 class="go-title" style="color:var(--kuka-orange); margin-bottom: 20px;">SPIELEREINRICHTUNG</h2>
+        <h2 class="go-title" style="color:var(--kuka-orange); margin-bottom: 20px; text-align: center;">
+          SPIELEREINRICHTUNG</h2>
         <p class="go-sub" style="margin-bottom: 20px;">Bitte trage deinen Namen und deine Firma ein, um in der globalen
           Bestenliste zu erscheinen.</p>
 
         <!-- Globaler Highscore Startscreen -->
-        <div style="text-align: center;">
-          <h3 style="color: var(--kuka-orange); font-size: 14px; margin-bottom: 5px; text-transform: uppercase;">
-            TOP 10 WELTWEIT</h3>
-          <div id="start-highscores-list" class="go-stats"
-            style="font-size: 12px; margin-bottom: 20px; min-height: 60px; text-align: left;">
-            Lade Bestenliste...
-          </div>
+        <div id="start-highscores-list" class="go-stats"
+          style="font-size: 12px; margin-bottom: 20px; min-height: 60px;">
+          <div
+            style="text-align: center; color: var(--kuka-orange); font-size: 14px; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;">
+            TOP 10 WELTWEIT</div>
+          Lade Bestenliste...
         </div>
 
         <div class="input-group">
@@ -216,9 +220,11 @@
       const listContainerGo = document.getElementById('global-highscores-list');
       const listContainerStart = document.getElementById('start-highscores-list');
 
+      const HEADING = `<div style="text-align: center; color: var(--kuka-orange); font-size: 14px; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;">TOP 10 WELTWEIT</div>`;
+
       const setHtml = (html) => {
-        if (listContainerGo) listContainerGo.innerHTML = html;
-        if (listContainerStart) listContainerStart.innerHTML = html;
+        if (listContainerGo) listContainerGo.innerHTML = HEADING + html;
+        if (listContainerStart) listContainerStart.innerHTML = HEADING + html;
       };
 
       try {
@@ -254,26 +260,29 @@
         setHtml("<span style='color:#ff4444'>Bestenliste konnte nicht geladen werden.</span>");
       }
     }
+
+    // Sofort beim Start laden
+    window.dbLoadTopScores();
   </script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
   <script src="script.js?v=5"></script>
   <script>
-      // ===== AUTO-SCALE: 1920×1080 auf Fenstergröße skalieren =====
-      (function () {
-        const GAME_W = 1920, GAME_H = 1080;
-        const wrapper = document.getElementById('game-wrapper');
-        function scaleGame() {
-          const scaleX = window.innerWidth / GAME_W;
-          const scaleY = window.innerHeight / GAME_H;
-          const scale = Math.min(scaleX, scaleY);        // Aspect-Ratio bewahren
-          const offX = Math.round((window.innerWidth - GAME_W * scale) / 2);
-          const offY = Math.round((window.innerHeight - GAME_H * scale) / 2);
-          wrapper.style.transform = `translate(${offX}px, ${offY}px) scale(${scale})`;
-        }
-        window.addEventListener('resize', scaleGame);
-        scaleGame();
-      })();
+    // ===== AUTO-SCALE: 1920×1080 auf Fenstergröße skalieren =====
+    (function () {
+      const GAME_W = 1920, GAME_H = 1080;
+      const wrapper = document.getElementById('game-wrapper');
+      function scaleGame() {
+        const scaleX = window.innerWidth / GAME_W;
+        const scaleY = window.innerHeight / GAME_H;
+        const scale = Math.min(scaleX, scaleY);        // Aspect-Ratio bewahren
+        const offX = Math.round((window.innerWidth - GAME_W * scale) / 2);
+        const offY = Math.round((window.innerHeight - GAME_H * scale) / 2);
+        wrapper.style.transform = `translate(${offX}px, ${offY}px) scale(${scale})`;
+      }
+      window.addEventListener('resize', scaleGame);
+      scaleGame();
+    })();
   </script>
 </body>
 

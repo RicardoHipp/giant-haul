@@ -190,7 +190,12 @@ const Audio = (() => {
     const f = c.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = 300; f.Q.value = 0.5;
     src.connect(f); f.connect(g); g.connect(c.destination); src.start(); ambNode = src;
   }
-  return { startServo, stopServo, setServoFreq, playGripper, playImpact, playPing, playTruckHorn, playClick, startAmb };
+  function stopAmb() {
+    if (!ambNode) return;
+    try { ambNode.stop(); } catch (e) { }
+    ambNode = null;
+  }
+  return { startServo, stopServo, setServoFreq, playGripper, playImpact, playPing, playTruckHorn, playClick, startAmb, stopAmb };
 })();
 
 // ===================================================================
@@ -794,6 +799,7 @@ class TitanTower {
   // --- Ergebnis-Overlay (Game Over oder LKW abgeschickt) ---
   _showResultOverlay(title, subtitle, delay) {
     Audio.stopServo(); // Stop engine sound
+    Audio.stopAmb();  // Stop background ambient
 
     const score = Math.round(this.truckParts * this.truckParts * 100 / Math.max(this.loadingTime, 1));
     this.score = score;
