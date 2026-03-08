@@ -11,7 +11,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700;900&family=Share+Tech+Mono&display=swap"
     rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=37" />
+  <link rel="stylesheet" href="style.css?v=38" />
   <link rel="manifest" href="manifest.json" />
 
   <!-- iOS PWA Meta Tags -->
@@ -295,7 +295,7 @@
   </script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
-  <script src="script.js?v=41"></script>
+  <script src="script.js?v=42"></script>
   <script>
     (function () {
       const GAME_W = 1920, GAME_H = 1080;
@@ -303,6 +303,16 @@
       let lastGoodScale = 1;
 
       function scaleGame(force = false) {
+        const vv = window.visualViewport;
+        const vw = vv ? vv.width : window.innerWidth;
+        const vh = vv ? vv.height : window.innerHeight;
+
+        // Im Hochformat Skalierung deaktivieren, damit Warnmeldung groß bleibt
+        if (vh > vw) {
+          wrapper.style.transform = 'none';
+          return;
+        }
+
         // NEU: Wenn ein Input-Feld fokussiert ist, stoppen wir das automatische Re-Scaling,
         // damit die Tastatur das Layout nicht "zerquetscht".
         const activeEl = document.activeElement;
@@ -314,10 +324,6 @@
           if (isInputActive) regOverlay.classList.add('keyboard-active');
           else regOverlay.classList.remove('keyboard-active');
         }
-
-        const vv = window.visualViewport;
-        const vw = vv ? vv.width : window.innerWidth;
-        const vh = vv ? vv.height : window.innerHeight;
 
         let scale;
         if (isInputActive && !force) {
