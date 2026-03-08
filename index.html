@@ -4,20 +4,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>TITAN HAUL – Schwerlast-Roboter</title>
+  <title>GIANT HAUL – Schwerlast-Roboter</title>
   <meta name="description" content="Physikbasiertes Stapelspiel mit dem Schwerlast-Roboter" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
     href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700;900&family=Share+Tech+Mono&display=swap"
     rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=42" />
+  <link rel="stylesheet" href="style.css?v=43" />
   <link rel="manifest" href="manifest.json" />
 
   <!-- iOS PWA Meta Tags -->
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="TITAN HAUL" />
+  <meta name="apple-mobile-web-app-title" content="GIANT HAUL" />
 </head>
 
 <body>
@@ -27,32 +27,32 @@
   </script>
   <script>
     // HARD UPDATE LOGIC WITH LOGGING
-    (function() {
-      const lastVersion = localStorage.getItem('titan_app_version');
+    (function () {
+      const lastVersion = localStorage.getItem('giant_app_version');
       console.log("[APP] Startvorgang... Version: " + APP_VERSION + " (Letzte bekannte: " + lastVersion + ")");
-      
+
       if (lastVersion && lastVersion !== APP_VERSION) {
         console.warn("[APP] UPDATE ERKANNT! Bereinige Speicher...");
         if ('serviceWorker' in navigator) {
-          caches.keys().then(names => { 
+          caches.keys().then(names => {
             for (let name of names) {
               console.log("[APP] Lösche Cache-Speicher: " + name);
-              caches.delete(name); 
+              caches.delete(name);
             }
           });
-          navigator.serviceWorker.getRegistrations().then(regs => { 
+          navigator.serviceWorker.getRegistrations().then(regs => {
             for (let r of regs) {
               console.log("[APP] Unregistriere ServiceWorker...");
-              r.unregister(); 
+              r.unregister();
             }
           });
         }
-        localStorage.setItem('titan_app_version', APP_VERSION);
+        localStorage.setItem('giant_app_version', APP_VERSION);
         console.warn("[APP] HArter Reload wird ausgelöst...");
         setTimeout(() => window.location.reload(true), 500);
         return;
       }
-      localStorage.setItem('titan_app_version', APP_VERSION);
+      localStorage.setItem('giant_app_version', APP_VERSION);
     })();
 
     if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
@@ -87,18 +87,30 @@
         <div class="smartpad-led" id="led-status"></div>
       </div>
       <div class="smartpad-display">
-        <div class="display-row"><span class="display-label">PUNKTE</span><span class="display-value" id="hud-score">0</span></div>
-        <div class="display-row"><span class="display-label">TEILE</span><span class="display-value" id="hud-parts">0</span></div>
-        <div class="display-row"><span class="display-label">ZEIT</span><span class="display-value" id="hud-level">0s</span></div>
+        <div class="display-row"><span class="display-label">PUNKTE</span><span class="display-value"
+            id="hud-score">0</span></div>
+        <div class="display-row"><span class="display-label">TEILE</span><span class="display-value"
+            id="hud-parts">0</span></div>
+        <div class="display-row"><span class="display-label">ZEIT</span><span class="display-value"
+            id="hud-level">0s</span></div>
       </div>
       <div class="smartpad-keys">
-        <div class="key-row"><div class="smartpad-key"></div><div class="smartpad-key orange"></div><div class="smartpad-key"></div></div>
-        <div class="key-row"><div class="smartpad-key"></div><div class="smartpad-key"></div><div class="smartpad-key orange"></div></div>
+        <div class="key-row">
+          <div class="smartpad-key"></div>
+          <div class="smartpad-key orange"></div>
+          <div class="smartpad-key"></div>
+        </div>
+        <div class="key-row">
+          <div class="smartpad-key"></div>
+          <div class="smartpad-key"></div>
+          <div class="smartpad-key orange"></div>
+        </div>
       </div>
     </div>
 
     <div id="top-buttons">
-      <button id="btn-restart" class="company-btn" onclick="game.restart()"><span class="btn-icon">↺</span> RESTART</button>
+      <button id="btn-restart" class="company-btn" onclick="game.restart()"><span class="btn-icon">↺</span>
+        RESTART</button>
     </div>
 
     <canvas id="gameCanvas"></canvas>
@@ -118,28 +130,36 @@
 
     <!-- Start Overlay -->
     <div id="overlay-start" class="game-overlay">
-      <button class="company-btn big btn-fullscreen-external" onclick="toggleFullScreen()"><span style="font-size: 50px; display:block; margin-bottom:10px;">⛶</span>VOLLBILD</button>
+      <button class="company-btn big btn-fullscreen-external" onclick="toggleFullScreen()"><span
+          style="font-size: 50px; display:block; margin-bottom:10px;">⛶</span>VOLLBILD</button>
       <div class="overlay-box">
         <div class="overlay-logo company-name-display">COMPANY</div>
-        <h1 class="overlay-title">TITAN<br><span class="overlay-sub">HAUL</span></h1>
+        <h1 class="overlay-title">GIANT<br><span class="overlay-sub">HAUL</span></h1>
         <p class="overlay-desc">Belade den LKW mit dem Schwerlast-Roboter – so viele Kisten wie möglich!</p>
         <!-- Anleitung Desktop -->
-        <div class="instr-desktop" style="background: rgba(243,112,33,0.12); border: 1px solid var(--company-orange); border-radius: 10px; padding: 16px 20px; margin: 14px 0; font-size: 18px; line-height: 2; font-family: 'Share Tech Mono', monospace; text-align: left; width: 100%; box-sizing: border-box;">
+        <div class="instr-desktop"
+          style="background: rgba(243,112,33,0.12); border: 1px solid var(--company-orange); border-radius: 10px; padding: 16px 20px; margin: 14px 0; font-size: 18px; line-height: 2; font-family: 'Share Tech Mono', monospace; text-align: left; width: 100%; box-sizing: border-box;">
           <kbd style="font-size:15px;">SPACE</kbd> / Klick = <strong>Kiste abwurf</strong><br>
           <kbd style="font-size:15px;">ENTER</kbd> / Rechtsklick = <strong>LKW abschicken</strong><br>
-          <kbd style="font-size:15px;">W</kbd> / <kbd style="font-size:15px;">S</kbd> / Mausrad = <strong>Speed ±</strong>
+          <kbd style="font-size:15px;">W</kbd> / <kbd style="font-size:15px;">S</kbd> / Mausrad = <strong>Speed
+            ±</strong>
         </div>
         <!-- Anleitung Mobil -->
-        <div class="instr-mobile" style="background: rgba(243,112,33,0.12); border: 1px solid var(--company-orange); border-radius: 10px; padding: 16px 20px; margin: 14px 0; font-size: 18px; line-height: 2; font-family: 'Share Tech Mono', monospace; text-align: left; width: 100%; box-sizing: border-box;">
+        <div class="instr-mobile"
+          style="background: rgba(243,112,33,0.12); border: 1px solid var(--company-orange); border-radius: 10px; padding: 16px 20px; margin: 14px 0; font-size: 18px; line-height: 2; font-family: 'Share Tech Mono', monospace; text-align: left; width: 100%; box-sizing: border-box;">
           <strong>Rechts tippen</strong> = Kiste abwurf<br>
           <strong>Links wischen ↑↓</strong> = Speed ±<br>
           <kbd style="font-size:15px;">ENTER</kbd> / Button = <strong>LKW abschicken</strong>
         </div>
-        <p class="overlay-desc" style="font-size: 13px; margin-top: 0;">Roboter holt neue Kisten <strong>am Rand</strong> ab.<br>Fällt eine Kiste runter → Runde vorbei!<br><small>Punkte = Teile² × 100 / Zeit</small></p>
-        
+        <p class="overlay-desc" style="font-size: 13px; margin-top: 0;">Roboter holt neue Kisten <strong>am
+            Rand</strong> ab.<br>Fällt eine Kiste runter → Runde vorbei!<br><small>Punkte = Teile² × 100 / Zeit</small>
+        </p>
+
         <div style="display: flex; gap: 15px; justify-content: center; margin-top: 5px;">
           <button id="btn-start" class="company-btn big" style="flex: 2;" onclick="game.start()">START</button>
-          <button class="company-btn big" style="flex: 1.5; background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.3); font-size: 14px;" onclick="document.getElementById('overlay-manual').classList.remove('hidden')">ANLEITUNG</button>
+          <button class="company-btn big"
+            style="flex: 1.5; background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.3); font-size: 14px;"
+            onclick="document.getElementById('overlay-manual').classList.remove('hidden')">ANLEITUNG</button>
         </div>
 
         <p class="overlay-hint">Klick / Leertaste = Abwurf</p>
@@ -148,18 +168,26 @@
 
     <!-- Handbuch Overlay -->
     <div id="overlay-manual" class="game-overlay hidden" style="z-index: 200;">
-      <div class="overlay-box" style="max-width: 700px; width: 90%; max-height: 85vh; overflow-y: auto; text-align: left; padding: 40px;">
-        <div style="border-bottom: 2px solid var(--company-orange); margin-bottom: 25px; padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+      <div class="overlay-box"
+        style="max-width: 700px; width: 90%; max-height: 85vh; overflow-y: auto; text-align: left; padding: 40px;">
+        <div
+          style="border-bottom: 2px solid var(--company-orange); margin-bottom: 25px; padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
           <h2 style="margin: 0; color: var(--company-orange); letter-spacing: 2px;">BEDIENERHANDBUCH</h2>
-          <button class="company-btn" onclick="document.getElementById('overlay-manual').classList.add('hidden')" style="padding: 5px 15px;">SCHLIESSEN</button>
+          <button class="company-btn" onclick="document.getElementById('overlay-manual').classList.add('hidden')"
+            style="padding: 5px 15px;">SCHLIESSEN</button>
         </div>
-        
-        <div class="manual-content" style="font-family: 'Share Tech Mono', monospace; font-size: 15px; line-height: 1.6; color: #ccc;">
-          <h3 style="color: #fff; border-left: 4px solid var(--company-orange); padding-left: 10px;">1. DAS SPIELZIEL</h3>
-          <p>Belade den LKW so effizient und stabil wie möglich. Jede zusätzliche Kiste bringt quadratisch mehr Punkte!</p>
-          <p style="color: #ff4444;"><strong>ACHTUNG:</strong> Fällt eine Kiste vom LKW, ist die Runde sofort beendet (SYSTEM FAULT).</p>
 
-          <h3 style="color: #fff; border-left: 4px solid var(--company-orange); padding-left: 10px; margin-top: 25px;">2. DIE STEUERUNG</h3>
+        <div class="manual-content"
+          style="font-family: 'Share Tech Mono', monospace; font-size: 15px; line-height: 1.6; color: #ccc;">
+          <h3 style="color: #fff; border-left: 4px solid var(--company-orange); padding-left: 10px;">1. DAS SPIELZIEL
+          </h3>
+          <p>Belade den LKW so effizient und stabil wie möglich. Jede zusätzliche Kiste bringt quadratisch mehr Punkte!
+          </p>
+          <p style="color: #ff4444;"><strong>ACHTUNG:</strong> Fällt eine Kiste vom LKW, ist die Runde sofort beendet
+            (SYSTEM FAULT).</p>
+
+          <h3 style="color: #fff; border-left: 4px solid var(--company-orange); padding-left: 10px; margin-top: 25px;">
+            2. DIE STEUERUNG</h3>
           <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 5px; margin-bottom: 10px;">
             <strong>AM PC:</strong><br>
             • Abwurf: SPACE / Linksklick<br>
@@ -173,18 +201,21 @@
             • Abschicken: Button nutzen
           </div>
 
-          <h3 style="color: #fff; border-left: 4px solid var(--company-orange); padding-left: 10px; margin-top: 25px;">3. MECHANIKEN</h3>
+          <h3 style="color: #fff; border-left: 4px solid var(--company-orange); padding-left: 10px; margin-top: 25px;">
+            3. MECHANIKEN</h3>
           <p>• <strong>TRÄGHEIT:</strong> Kisten behalten beim Abwurf die Fahrtgeschwindigkeit des Roboters bei.</p>
           <p>• <strong>STABILITÄT:</strong> Ein Teil wird erst gewertet, wenn es ruhig liegt (orangener Glow).</p>
           <p>• <strong>PUNKTE:</strong> (Teile² × 100) / Ladezeit. Schnelligkeit zahlt sich aus!</p>
 
-          <h3 style="color: #fff; border-left: 4px solid var(--company-orange); padding-left: 10px; margin-top: 25px;">4. PROFI-TIPPS</h3>
+          <h3 style="color: #fff; border-left: 4px solid var(--company-orange); padding-left: 10px; margin-top: 25px;">
+            4. PROFI-TIPPS</h3>
           <p>• Schwere Container nach unten stabeln.<br>
-             • Schwerpunkt mittig über den LKW-Achsen halten.<br>
-             • Vor dem Abwurf leicht abbremsen für mehr Präzision.</p>
+            • Schwerpunkt mittig über den LKW-Achsen halten.<br>
+            • Vor dem Abwurf leicht abbremsen für mehr Präzision.</p>
         </div>
-        
-        <button class="company-btn big" style="width: 100%; margin-top: 30px;" onclick="document.getElementById('overlay-manual').classList.add('hidden')">VERSTANDEN</button>
+
+        <button class="company-btn big" style="width: 100%; margin-top: 30px;"
+          onclick="document.getElementById('overlay-manual').classList.add('hidden')">VERSTANDEN</button>
       </div>
     </div>
 
@@ -193,16 +224,19 @@
       <div class="overlay-box" style="max-width: 500px; padding: 40px;">
         <h2 style="color:var(--company-orange); margin-top:0; letter-spacing:1px;">VOLLBILD AUF DEM IPHONE</h2>
         <p style="font-size:16px; line-height:1.5; color:#ccc; margin-bottom:20px;">
-          Apple Safari unterstützt keinen direkten Vollbildmodus. Füge das Spiel zu deinem Home-Bildschirm hinzu, um ohne störende Leisten zu spielen:
+          Apple Safari unterstützt keinen direkten Vollbildmodus. Füge das Spiel zu deinem Home-Bildschirm hinzu, um
+          ohne störende Leisten zu spielen:
         </p>
-        <div style="text-align:left; background:rgba(0,0,0,0.3); padding:20px; border-radius:8px; font-family:'Share Tech Mono', monospace; font-size:16px; line-height:1.8;">
+        <div
+          style="text-align:left; background:rgba(0,0,0,0.3); padding:20px; border-radius:8px; font-family:'Share Tech Mono', monospace; font-size:16px; line-height:1.8;">
           1. Tippe unten rechts auf die <strong>drei Punkte (...)</strong><br>
           2. Wähle <strong>"Teilen..."</strong> (oder das Quadrat mit Pfeil)<br>
           3. Scrolle im neuen Menü nach unten<br>
           4. Tippe auf <strong>"Zum Home-Bildschirm"</strong><br>
           5. Bestätige oben rechts mit <strong>"Hinzufügen"</strong>
         </div>
-        <button class="company-btn big" style="width: 100%; margin-top: 25px;" onclick="document.getElementById('overlay-ios-fullscreen').classList.add('hidden')">VERSTANDEN</button>
+        <button class="company-btn big" style="width: 100%; margin-top: 25px;"
+          onclick="document.getElementById('overlay-ios-fullscreen').classList.add('hidden')">VERSTANDEN</button>
       </div>
     </div>
 
@@ -218,8 +252,11 @@
           <div class="stat-row"><span>Punkte:</span><span id="go-score">0</span></div>
           <div class="stat-row"><span>Lokaler Highscore:</span><span id="go-hi">0</span></div>
         </div>
-        <div id="global-highscores-list" class="go-stats" style="font-size: 12px; margin-bottom: 20px; min-height: 60px; margin-top: 15px;">
-          <div style="text-align: center; color: var(--company-orange); font-size: 14px; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;">TOP 10 WELTWEIT</div>
+        <div id="global-highscores-list" class="go-stats"
+          style="font-size: 12px; margin-bottom: 20px; min-height: 60px; margin-top: 15px;">
+          <div
+            style="text-align: center; color: var(--company-orange); font-size: 14px; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;">
+            TOP 10 WELTWEIT</div>
           Lade Bestenliste...
         </div>
         <button class="company-btn big" onclick="game.restart()">NEUSTART</button>
@@ -228,17 +265,27 @@
 
     <!-- Registration Overlay -->
     <div id="overlay-register" class="game-overlay">
-      <button class="company-btn big btn-fullscreen-external" onclick="toggleFullScreen()"><span style="font-size: 50px; display:block; margin-bottom:10px;">⛶</span>VOLLBILD</button>
+      <button class="company-btn big btn-fullscreen-external" onclick="toggleFullScreen()"><span
+          style="font-size: 50px; display:block; margin-bottom:10px;">⛶</span>VOLLBILD</button>
       <div class="overlay-box">
-        <h2 class="go-title" style="color:var(--company-orange); margin-bottom: 20px; text-align: center;">SPIELEREINRICHTUNG</h2>
+        <h2 class="go-title" style="color:var(--company-orange); margin-bottom: 20px; text-align: center;">
+          SPIELEREINRICHTUNG</h2>
         <p class="go-sub" style="margin-bottom: 20px;">Trage deinen Namen ein, um in der Bestenliste zu erscheinen.</p>
-        <div id="start-highscores-list" class="go-stats" style="font-size: 12px; margin-bottom: 20px; min-height: 60px;">
-          <div style="text-align: center; color: var(--company-orange); font-size: 14px; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;">TOP 10 WELTWEIT</div>
+        <div id="start-highscores-list" class="go-stats"
+          style="font-size: 12px; margin-bottom: 20px; min-height: 60px;">
+          <div
+            style="text-align: center; color: var(--company-orange); font-size: 14px; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;">
+            TOP 10 WELTWEIT</div>
           Lade Bestenliste...
         </div>
-        <div class="input-group"><label for="input-playername">SPIELERNAME</label><input type="text" id="input-playername" placeholder="Name" maxlength="20" autocomplete="off" autocorrect="off" autocapitalize="words" spellcheck="false" /></div>
-        <div class="input-group"><label for="input-companyname">FIRMENNAME / TEAM</label><input type="text" id="input-companyname" placeholder="Firma" maxlength="8" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" /></div>
-        <button id="btn-save-profile" class="company-btn big" style="width: 100%; margin-top: 25px;" onclick="savePlayerProfile()">SPEICHERN & STARTEN</button>
+        <div class="input-group"><label for="input-playername">SPIELERNAME</label><input type="text"
+            id="input-playername" placeholder="Name" maxlength="20" autocomplete="off" autocorrect="off"
+            autocapitalize="words" spellcheck="false" /></div>
+        <div class="input-group"><label for="input-companyname">FIRMENNAME / TEAM</label><input type="text"
+            id="input-companyname" placeholder="Firma" maxlength="8" autocomplete="off" autocorrect="off"
+            autocapitalize="characters" spellcheck="false" /></div>
+        <button id="btn-save-profile" class="company-btn big" style="width: 100%; margin-top: 25px;"
+          onclick="savePlayerProfile()">SPEICHERN & STARTEN</button>
       </div>
     </div>
 
@@ -247,7 +294,7 @@
       <div class="orientation-box">
         <div class="orientation-icon">📱 🔄</div>
         <h2>BITTE GERÄT DREHEN</h2>
-        <p>TITAN HAUL ist für das Querformat optimiert.</p>
+        <p>GIANTHAUL ist für das Querformat optimiert.</p>
       </div>
     </div>
   </div>
@@ -266,27 +313,27 @@
       try {
         // Lade massiv mehr Einträge (1000), um Dubletten filtern zu können
         const q = query(collection(db, "highscores"), orderBy("score", "desc"), limit(1000));
-        const snap = await getDocs(q); 
+        const snap = await getDocs(q);
         let html = ""; let r = 1;
         const seenPlayers = new Set();
 
-        snap.forEach((doc) => { 
+        snap.forEach((doc) => {
           if (r > 10) return;
-          const d = doc.data(); 
+          const d = doc.data();
           const playerKey = (d.player + "|||" + d.company).toLowerCase();
-          
+
           if (seenPlayers.has(playerKey)) return;
           seenPlayers.add(playerKey);
 
           const vStr = d.version ? `<small style="opacity:0.4; font-size:8px; margin-left:2px;">v${d.version}</small>` : "";
           const statsStr = (d.parts && d.time) ? `<span style="font-size:12px; color:var(--light1); font-weight:400; min-width:110px; text-align:right; margin-right:15px;">${d.parts} 📦 / ${Math.round(d.time)}s</span>` : `<span style="min-width:110px;"></span>`;
-          
+
           html += `<div class="stat-row" style="height:auto; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); align-items: center;">
             <span style="flex:1; text-align:left; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; padding-right:10px;">${r}. ${d.player} [${d.company}]${vStr}</span>
             ${statsStr}
             <span style="font-weight:900; color:var(--company-orange); min-width:60px; text-align:right; font-size:16px;">${d.score}</span>
-          </div>`; 
-          r++; 
+          </div>`;
+          r++;
         });
         if (lG) lG.innerHTML = H + (html || "Keine Einträge."); if (lS) lS.innerHTML = H + (html || "Keine Einträge.");
       } catch (e) { }
@@ -295,7 +342,7 @@
   </script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
-  <script src="script.js?v=46"></script>
+  <script src="script.js?v=48"></script>
   <script>
     (function () {
       const GAME_W = 1920, GAME_H = 1080;
@@ -321,12 +368,11 @@
 
         const activeEl = document.activeElement;
         const isInputActive = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA');
-        
+
         const regOverlay = document.getElementById('overlay-register');
         if (regOverlay) {
-          // Nur ausblenden (keyboard-active), wenn ein Input aktiv UND der Platz durch die Tastatur begrenzt ist
-          if (isInputActive && vh < 600) regOverlay.classList.add('keyboard-active');
-          else regOverlay.classList.remove('keyboard-active');
+          // Bestenliste immer eingeblendet lassen (Testmodus)
+          regOverlay.classList.remove('keyboard-active');
         }
 
         let scale;
@@ -341,9 +387,9 @@
 
         const offX = Math.round((vw - GAME_W * scale) / 2);
         let offY = Math.round((vh - GAME_H * scale) / 2);
-        
+
         if (isInputActive && vh < 600) {
-          offY = 10; 
+          offY = 10;
         }
 
         wrapper.style.transform = `translate(${offX}px, ${offY}px) scale(${scale})`;
@@ -372,4 +418,5 @@
     })();
   </script>
 </body>
+
 </html>

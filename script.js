@@ -1,5 +1,5 @@
 /* ===================================================================
-   TITAN HAUL – script.js
+   GIANT HAUL – script.js
    COMPANY Schwerlast-Roboter | LKW-Beladespiel | Matter.js Rigid-Body-Physik
    =================================================================== */
 'use strict';
@@ -10,8 +10,8 @@ const { Engine, Render, World, Bodies, Body, Events, Runner } = Matter;
 // ===================================================================
 // SPIELER-PROFIL & BRANDING
 // ===================================================================
-let globalPlayerName = localStorage.getItem('titan_player') || '';
-let globalCompanyName = localStorage.getItem('titan_company') || 'COMPANY';
+let globalPlayerName = localStorage.getItem('giant_player') || '';
+let globalCompanyName = localStorage.getItem('giant_company') || 'COMPANY';
 
 // UI-Elemente mit dem Firmennamen aktualisieren
 function updateCompanyBranding() {
@@ -35,8 +35,8 @@ window.savePlayerProfile = function () {
   globalPlayerName = nameInput;
   globalCompanyName = compInput ? compInput.toUpperCase().substring(0, 8) : 'COMPANY';
 
-  localStorage.setItem('titan_player', globalPlayerName);
-  localStorage.setItem('titan_company', globalCompanyName);
+  localStorage.setItem('giant_player', globalPlayerName);
+  localStorage.setItem('giant_company', globalCompanyName);
 
   updateCompanyBranding();
 
@@ -239,7 +239,7 @@ const Audio = (() => {
     const c = getCtx(), t = c.currentTime;
     truckEngineGain.gain.setTargetAtTime(0, t, 0.2);
     setTimeout(() => { if (truckEngineNode) { try { truckEngineNode.stop(); } catch (e) { } truckEngineNode = null; truckEngineGain = null; } }, 300);
-    
+
     if (withSqueal) {
       const sSrc = c.createBufferSource(); sSrc.buffer = noise();
       const sG = c.createGain(); sG.gain.setValueAtTime(0, t);
@@ -609,7 +609,7 @@ class Particle {
 // ===================================================================
 // HAUPTSPIEL
 // ===================================================================
-class TitanTower {
+class GiantTower {
   constructor() {
     this.canvas = document.getElementById('gameCanvas');
     this.ctx = this.canvas.getContext('2d');
@@ -635,10 +635,10 @@ class TitanTower {
     const handleInput = (e) => {
       // Ignoriere Klicks auf UI-Elemente
       if (e.target.closest('button') || e.target.closest('.overlay-box') || e.target.closest('.smartpad-panel') || e.target.closest('#speed-panel') || e.target.closest('.input-group')) return;
-      
+
       // Position des Klicks/Touch bestimmen
       const x = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
-      
+
       // NEU: Wenn der Touch/Klick im linken Bereich ist (Speed-Zone), kein Abwurf!
       // Das erlaubt das Wischen links, ohne dass eine Kiste fällt.
       if (x < window.innerWidth * 0.35) return;
@@ -667,8 +667,8 @@ class TitanTower {
     window.addEventListener('contextmenu', e => {
       // Ignoriere UI
       if (e.target.closest('button') || e.target.closest('.overlay-box')) return;
-      e.preventDefault(); 
-      this.sendTruck(); 
+      e.preventDefault();
+      this.sendTruck();
     });
 
     // Mausrad = Geschwindigkeit (bleibt am Fenster)
@@ -924,7 +924,7 @@ class TitanTower {
   // --- Ergebnis-Overlay (Game Over oder LKW abgeschickt) ---
   _showResultOverlay(title, subtitle, delay) {
     Audio.stopServo();
-    Audio.stopAmb(); 
+    Audio.stopAmb();
 
     const score = Math.round(this.truckParts * this.truckParts * 100 / Math.max(this.loadingTime, 1));
     this.score = score;
@@ -1253,4 +1253,4 @@ class TitanTower {
 // ===================================================================
 // START
 // ===================================================================
-const game = new TitanTower();
+const game = new GiantTower();

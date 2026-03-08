@@ -1,4 +1,4 @@
-# TITAN HAUL – COMPANY KR Loading Game
+# GIANT HAUL – COMPANY Loading Game
 
 Ein physikbasiertes Stapelspiel mit dem Schwerlast-Roboter Industrieroboter. Belade den LKW mit so vielen Kisten wie möglich, ohne dass eine herunterfällt!
 
