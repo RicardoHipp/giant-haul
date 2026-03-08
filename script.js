@@ -43,6 +43,11 @@ window.savePlayerProfile = function () {
 
 // Überprüfen, welches Overlay beim Start gezeigt werden soll
 function checkPlayerProfile() {
+  // Lade Bestenliste beim Spielstart
+  if (window.dbLoadTopScores) {
+    window.dbLoadTopScores();
+  }
+
   // Zeige IMMER die Registrierung beim ersten Laden der Seite
   document.getElementById('overlay-start').classList.add('hidden');
   document.getElementById('overlay-register').classList.remove('hidden');

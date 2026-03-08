@@ -129,8 +129,16 @@
     <div id="overlay-register" class="game-overlay">
       <div class="overlay-box">
         <h2 class="go-title" style="color:var(--kuka-orange); margin-bottom: 20px;">SPIELEREINRICHTUNG</h2>
-        <p class="go-sub" style="margin-bottom: 30px;">Bitte trage deinen Namen und deine Firma ein, um in der globalen
+        <p class="go-sub" style="margin-bottom: 20px;">Bitte trage deinen Namen und deine Firma ein, um in der globalen
           Bestenliste zu erscheinen.</p>
+
+        <!-- Globaler Highscore Startscreen -->
+        <h3 style="color: var(--kuka-orange); font-size: 14px; margin-bottom: 5px; text-transform: uppercase;">
+          TOP 10 WELTWEIT</h3>
+        <div id="start-highscores-list" class="go-stats"
+          style="font-size: 12px; margin-bottom: 20px; min-height: 60px;">
+          Lade Bestenliste...
+        </div>
 
         <div class="input-group">
           <label for="input-playername">SPIELERNAME</label>
@@ -197,15 +205,20 @@
       }
     };
 
-    // Top 3 Scores laden für das Game-Over Overlay
+    // Top 10 Scores laden für das Game-Over Overlay und Start-Overlay
     window.dbLoadTopScores = async function () {
       if (!db) return;
 
-      const listContainer = document.getElementById('global-highscores-list');
-      if (!listContainer) return;
+      const listContainerGo = document.getElementById('global-highscores-list');
+      const listContainerStart = document.getElementById('start-highscores-list');
+
+      const setHtml = (html) => {
+        if (listContainerGo) listContainerGo.innerHTML = html;
+        if (listContainerStart) listContainerStart.innerHTML = html;
+      };
 
       try {
-        listContainer.innerHTML = "Lade Bestenliste...";
+        setHtml("Lade Bestenliste...");
 
         // Abfrage: Die 10 höchsten Scores (absteigend sortiert)
         const q = query(collection(db, "highscores"), orderBy("score", "desc"), limit(10));
@@ -228,13 +241,13 @@
         });
 
         if (html === "") {
-          listContainer.innerHTML = "Noch keine Einträge vorhanden.";
+          setHtml("Noch keine Einträge vorhanden.");
         } else {
-          listContainer.innerHTML = html;
+          setHtml(html);
         }
       } catch (e) {
         console.error("Fehler beim Laden der Highscores:", e);
-        listContainer.innerHTML = "<span style='color:#ff4444'>Bestenliste konnte nicht geladen werden.</span>";
+        setHtml("<span style='color:#ff4444'>Bestenliste konnte nicht geladen werden.</span>");
       }
     }
   </script>
