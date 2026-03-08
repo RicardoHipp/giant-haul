@@ -1,8 +1,9 @@
-// Version: 1.0.42
-// Importiert die zentrale Versionsnummer
+// Version: 1.0.43
 importScripts('version.js');
 
-const CACHE_NAME = 'titan-haul-' + APP_VERSION;
+const CACHE_NAME = 'titan-haul-cache-v' + APP_VERSION;
+
+// Dateien, die für den Offline-Modus gespeichert werden
 const ASSETS = [
   'index.html',
   'style.css',
@@ -14,7 +15,7 @@ const ASSETS = [
 ];
 
 self.addEventListener('install', (event) => {
-  self.skipWaiting(); // Zwingt den neuen SW, nicht auf das Schließen der Tabs zu warten
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
   );
@@ -23,7 +24,7 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     Promise.all([
-      self.clients.claim(), // Übernimmt sofort die Kontrolle über alle offenen Tabs
+      self.clients.claim(),
       caches.keys().then((keys) => {
         return Promise.all(
           keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
@@ -33,24 +34,21 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-self.addEventListener('message', (event) => {
-  if (event.data === 'skipWaiting') {
-    self.skipWaiting();
-  }
-});
-
-// Fetch Event (Network First für HTML, Cache First für andere Assets)
+// RADIKALER NETWORK-FIRST ANSATZ
 self.addEventListener('fetch', (event) => {
-  if (event.request.mode === 'navigate') {
-    event.respondWith(
-      fetch(event.request).catch(() => caches.match(event.request))
-    );
-    return;
-  }
-
   event.respondWith(
-    caches.match(event.request).then((response) => {
-      return response || fetch(event.request);
-    })
+    fetch(event.request)
+      .then((response) => {
+        // Wenn Netzwerk erfolgreich, Kopie im Cache aktualisieren
+        const resClone = response.clone();
+        caches.open(CACHE_NAME).then((cache) => {
+          cache.put(event.request, resClone);
+        });
+        return response;
+      })
+      .catch(() => {
+        // Nur wenn Netzwerk fehlschlägt (Offline), Cache nutzen
+        return caches.match(event.request);
+      })
   );
 });
