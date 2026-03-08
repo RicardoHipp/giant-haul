@@ -788,6 +788,8 @@ class TitanTower {
 
   // --- Ergebnis-Overlay (Game Over oder LKW abgeschickt) ---
   _showResultOverlay(title, subtitle, delay) {
+    Audio.stopServo(); // Stop engine sound
+
     const score = Math.round(this.truckParts * this.truckParts * 100 / Math.max(this.loadingTime, 1));
     this.score = score;
     const isMission = title === 'MISSION COMPLETE';
