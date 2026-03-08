@@ -1,4 +1,4 @@
-# TITAN HAUL – KUKA KR Loading Game
+# TITAN HAUL – COMPANY KR Loading Game
 
 Ein physikbasiertes Stapelspiel mit dem KR TITAN Industrieroboter. Belade den LKW mit so vielen Kisten wie möglich, ohne dass eine herunterfällt!
 
@@ -11,4 +11,4 @@ Ein physikbasiertes Stapelspiel mit dem KR TITAN Industrieroboter. Belade den LK
 - Anpassbares Spieler- und Firmenbranding
 
 ---
-*Erstellt für die KUKA Roboter-Fans.*
+*Erstellt für die COMPANY Roboter-Fans.*

@@ -1,6 +1,6 @@
 /* ===================================================================
    TITAN HAUL – script.js
-   KUKA KR TITAN | LKW-Beladespiel | Matter.js Rigid-Body-Physik
+   COMPANY KR TITAN | LKW-Beladespiel | Matter.js Rigid-Body-Physik
    =================================================================== */
 'use strict';
 
@@ -11,7 +11,7 @@ const { Engine, Render, World, Bodies, Body, Events, Runner } = Matter;
 // SPIELER-PROFIL & BRANDING
 // ===================================================================
 let globalPlayerName = localStorage.getItem('titan_player') || '';
-let globalCompanyName = localStorage.getItem('titan_company') || 'KUKA';
+let globalCompanyName = localStorage.getItem('titan_company') || 'COMPANY';
 
 // UI-Elemente mit dem Firmennamen aktualisieren
 function updateCompanyBranding() {
@@ -30,7 +30,7 @@ window.savePlayerProfile = function () {
   }
 
   globalPlayerName = nameInput;
-  globalCompanyName = compInput ? compInput.toUpperCase().substring(0, 8) : 'KUKA';
+  globalCompanyName = compInput ? compInput.toUpperCase().substring(0, 8) : 'COMPANY';
 
   localStorage.setItem('titan_player', globalPlayerName);
   localStorage.setItem('titan_company', globalCompanyName);
@@ -267,7 +267,7 @@ class Block {
     roundRect(ctx, -hw, -hh, this.w, this.h, 5);
     ctx.strokeStyle = 'rgba(255,255,255,0.18)'; ctx.lineWidth = 1.5; ctx.stroke();
 
-    // Label dynamisch setzen (Company Name vs KUKA)
+    // Label dynamisch setzen (Company Name vs COMPANY)
     ctx.fillStyle = 'rgba(255,255,255,0.45)';
     ctx.font = 'bold 11px "Roboto Condensed",sans-serif';
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
@@ -594,7 +594,7 @@ class TitanTower {
       e.preventDefault();
       this._adjustSpeed(e.deltaY < 0 ? +30 : -30);
     }, { passive: false });
-    document.querySelectorAll('.kuka-btn').forEach(b => b.addEventListener('mousedown', () => Audio.playClick()));
+    document.querySelectorAll('.company-btn').forEach(b => b.addEventListener('mousedown', () => Audio.playClick()));
 
     this._lastTime = null;
     requestAnimationFrame(ts => this._loop(ts));

@@ -1,6 +1,6 @@
 /* ===================================================================
    TITAN TOWER – style.css
-   KUKA Design System: Orange #f37021, Industriegrau #2c2f33 / #4a4d52
+   COMPANY Design System: Orange #f37021, Industriegrau #2c2f33 / #4a4d52
    =================================================================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700;900&family=Share+Tech+Mono&display=swap');
@@ -15,8 +15,8 @@
 }
 
 :root {
-  --kuka-orange: #f37021;
-  --kuka-orange2: #d45f10;
+  --company-orange: #f37021;
+  --company-orange2: #d45f10;
   --dark1: #1a1c1f;
   --dark2: #2c2f33;
   --dark3: #4a4d52;
@@ -86,11 +86,11 @@ body {
   margin-bottom: 8px;
 }
 
-.kuka-logo {
+.company-logo {
   font-size: 13px;
   font-weight: 900;
   letter-spacing: 3px;
-  color: var(--kuka-orange);
+  color: var(--company-orange);
   text-shadow: 0 0 8px rgba(243, 112, 33, .5);
 }
 
@@ -145,7 +145,7 @@ body {
 
 .display-value {
   font-size: 16px;
-  color: var(--kuka-orange);
+  color: var(--company-orange);
   font-weight: 700;
   text-shadow: 0 0 6px rgba(243, 112, 33, .4);
   min-width: 50px;
@@ -175,8 +175,8 @@ body {
 }
 
 .smartpad-key.orange {
-  background: var(--kuka-orange);
-  border-color: var(--kuka-orange2);
+  background: var(--company-orange);
+  border-color: var(--company-orange2);
   box-shadow: 0 2px 0 #7a3510, 0 0 6px rgba(243, 112, 33, .3);
 }
 
@@ -193,9 +193,9 @@ body {
 }
 
 /* ===================================================================
-   KUKA BUTTON
+   COMPANY BUTTON
    =================================================================== */
-.kuka-btn {
+.company-btn {
   font-family: 'Roboto Condensed', sans-serif;
   font-weight: 700;
   font-size: 13px;
@@ -214,16 +214,16 @@ body {
   gap: 6px;
 }
 
-.kuka-btn:hover {
+.company-btn:hover {
   filter: brightness(1.1);
 }
 
-.kuka-btn:active {
+.company-btn:active {
   transform: translateY(2px);
   box-shadow: 0 1px 0 #7a3510, 0 2px 6px rgba(243, 112, 33, .2);
 }
 
-.kuka-btn.big {
+.company-btn.big {
   font-size: 18px;
   padding: 14px 40px;
   letter-spacing: 4px;
@@ -255,7 +255,7 @@ body {
 
 .overlay-box {
   background: linear-gradient(160deg, #2c2f33 0%, #1a1c1f 100%);
-  border: 2px solid var(--kuka-orange);
+  border: 2px solid var(--company-orange);
   border-radius: 16px;
   padding: 40px 50px;
   text-align: center;
@@ -284,7 +284,7 @@ body {
   font-size: 14px;
   font-weight: 900;
   letter-spacing: 5px;
-  color: var(--kuka-orange);
+  color: var(--company-orange);
   text-shadow: 0 0 12px rgba(243, 112, 33, .6);
   margin-bottom: 8px;
 }
@@ -299,7 +299,7 @@ body {
 
 .overlay-sub {
   font-size: 52px;
-  color: var(--kuka-orange);
+  color: var(--company-orange);
 }
 
 .overlay-desc {
@@ -375,7 +375,7 @@ kbd {
 }
 
 .stat-row span:last-child {
-  color: var(--kuka-orange);
+  color: var(--company-orange);
   font-weight: 700;
 }
 
@@ -413,7 +413,7 @@ kbd {
 }
 
 .input-group input:focus {
-  border-color: var(--kuka-orange);
+  border-color: var(--company-orange);
   box-shadow: 0 0 10px rgba(243, 112, 33, 0.3);
 }
 
@@ -505,7 +505,7 @@ kbd {
   font-family: 'Share Tech Mono', monospace;
   font-size: 9px;
   letter-spacing: 2px;
-  color: var(--kuka-orange);
+  color: var(--company-orange);
   margin-bottom: 2px;
 }
 
@@ -547,7 +547,7 @@ kbd {
 #speed-value {
   font-size: 18px;
   font-weight: 700;
-  color: var(--kuka-orange);
+  color: var(--company-orange);
   display: block;
   transition: color .2s;
 }

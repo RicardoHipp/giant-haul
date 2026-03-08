@@ -4,8 +4,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TITAN HAUL – KUKA KR Loading Game</title>
-  <meta name="description" content="KUKA TITAN Tower – Physikbasiertes Stapelspiel mit dem KR TITAN Industrieroboter" />
+  <title>TITAN HAUL – COMPANY KR Loading Game</title>
+  <meta name="description" content="COMPANY TITAN Tower – Physikbasiertes Stapelspiel mit dem KR TITAN Industrieroboter" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
@@ -20,7 +20,7 @@
     <!-- SmartPAD HUD (oben links) -->
     <div id="smartpad" class="smartpad-panel">
       <div class="smartpad-header">
-        <span class="kuka-logo company-name-display">KUKA</span>
+        <span class="company-logo company-name-display">COMPANY</span>
         <div class="smartpad-led" id="led-status"></div>
       </div>
       <div class="smartpad-display">
@@ -53,7 +53,7 @@
 
     <!-- Buttons oben rechts -->
     <div id="top-buttons">
-      <button id="btn-restart" class="kuka-btn" onclick="game.restart()">
+      <button id="btn-restart" class="company-btn" onclick="game.restart()">
         <span class="btn-icon">↺</span> RESTART
       </button>
     </div>
@@ -72,7 +72,7 @@
 
     <!-- Abschicken-Button (sichtbar während Beladung) -->
     <div id="send-truck-bar" class="hidden">
-      <button id="btn-send" class="kuka-btn send-btn" onclick="game.sendTruck()">
+      <button id="btn-send" class="company-btn send-btn" onclick="game.sendTruck()">
         🚛 LKW ABSCHICKEN
       </button>
       <span class="send-hint">oder <kbd>ENTER</kbd> / Rechtsklick</span>
@@ -81,13 +81,13 @@
     <!-- Overlay: Startscreen -->
     <div id="overlay-start" class="game-overlay">
       <div class="overlay-box">
-        <div class="overlay-logo company-name-display">KUKA</div>
+        <div class="overlay-logo company-name-display">COMPANY</div>
         <h1 class="overlay-title">TITAN<br><span class="overlay-sub">HAUL</span></h1>
         <p class="overlay-desc">
           Belade den LKW mit dem KR TITAN – so viele Kisten wie möglich!
         </p>
         <div
-          style="background: rgba(243,112,33,0.12); border: 1px solid var(--kuka-orange); border-radius: 10px; padding: 16px 20px; margin: 14px 0; font-size: 18px; line-height: 2; font-family: 'Share Tech Mono', monospace; text-align: left; width: 100%; box-sizing: border-box;">
+          style="background: rgba(243,112,33,0.12); border: 1px solid var(--company-orange); border-radius: 10px; padding: 16px 20px; margin: 14px 0; font-size: 18px; line-height: 2; font-family: 'Share Tech Mono', monospace; text-align: left; width: 100%; box-sizing: border-box;">
           <kbd style="font-size:15px;">SPACE</kbd> / Klick &nbsp;= <strong>Kiste abwerfen</strong><br>
           <kbd style="font-size:15px;">ENTER</kbd> / Rechtsklick &nbsp;= <strong>LKW abschicken</strong><br>
           <kbd style="font-size:15px;">W</kbd> / <kbd style="font-size:15px;">S</kbd> / Mausrad &nbsp;=
@@ -98,7 +98,7 @@
           Fällt eine Kiste runter → Runde vorbei!<br>
           <small>Punkte = Teile² × 100 / Zeit</small>
         </p>
-        <button id="btn-start" class="kuka-btn big" onclick="game.start()">
+        <button id="btn-start" class="company-btn big" onclick="game.start()">
           START
         </button>
         <p class="overlay-hint">Klick / Leertaste = Abwurf</p>
@@ -122,19 +122,19 @@
         <div id="global-highscores-list" class="go-stats"
           style="font-size: 12px; margin-bottom: 20px; min-height: 60px; margin-top: 15px;">
           <div
-            style="text-align: center; color: var(--kuka-orange); font-size: 14px; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;">
+            style="text-align: center; color: var(--company-orange); font-size: 14px; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;">
             TOP 10 WELTWEIT</div>
           Lade Bestenliste...
         </div>
 
-        <button class="kuka-btn big" onclick="game.restart()">NEUSTART</button>
+        <button class="company-btn big" onclick="game.restart()">NEUSTART</button>
       </div>
     </div>
 
     <!-- Overlay: Registration (First Start) -->
     <div id="overlay-register" class="game-overlay">
       <div class="overlay-box">
-        <h2 class="go-title" style="color:var(--kuka-orange); margin-bottom: 20px; text-align: center;">
+        <h2 class="go-title" style="color:var(--company-orange); margin-bottom: 20px; text-align: center;">
           SPIELEREINRICHTUNG</h2>
         <p class="go-sub" style="margin-bottom: 20px;">Bitte trage deinen Namen und deine Firma ein, um in der globalen
           Bestenliste zu erscheinen.</p>
@@ -143,7 +143,7 @@
         <div id="start-highscores-list" class="go-stats"
           style="font-size: 12px; margin-bottom: 20px; min-height: 60px;">
           <div
-            style="text-align: center; color: var(--kuka-orange); font-size: 14px; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;">
+            style="text-align: center; color: var(--company-orange); font-size: 14px; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;">
             TOP 10 WELTWEIT</div>
           Lade Bestenliste...
         </div>
@@ -158,7 +158,7 @@
           <input type="text" id="input-companyname" placeholder="Deine Firma oder Team (max 8 Zeichen)" maxlength="8" />
         </div>
 
-        <button id="btn-save-profile" class="kuka-btn big" style="width: 100%; margin-top: 25px;"
+        <button id="btn-save-profile" class="company-btn big" style="width: 100%; margin-top: 25px;"
           onclick="savePlayerProfile()">SPEICHERN & STARTEN</button>
       </div>
     </div>
@@ -220,7 +220,7 @@
       const listContainerGo = document.getElementById('global-highscores-list');
       const listContainerStart = document.getElementById('start-highscores-list');
 
-      const HEADING = `<div style="text-align: center; color: var(--kuka-orange); font-size: 14px; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;">TOP 10 WELTWEIT</div>`;
+      const HEADING = `<div style="text-align: center; color: var(--company-orange); font-size: 14px; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;">TOP 10 WELTWEIT</div>`;
 
       const setHtml = (html) => {
         if (listContainerGo) listContainerGo.innerHTML = HEADING + html;
