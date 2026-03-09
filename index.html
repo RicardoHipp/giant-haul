@@ -318,7 +318,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs, query, orderBy, limit, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, getDocs, getDoc, setDoc, doc, query, orderBy, limit, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
     const firebaseConfig = {
       apiKey: "AIzaSyAYrbewR-WbHHnnHnbg047nsqKve9zS4xU",
       authDomain: "giant-haul.firebaseapp.com",
@@ -328,27 +328,41 @@
       appId: "1:803768066594:web:a778a1a74f06acf63ee07b"
     };
     const app = initializeApp(firebaseConfig); const db = getFirestore(app);
+
+    // NEU: Speichert Highscores in 'highscores' (Historie) UND 'leaders' (Bestenliste)
     window.dbSaveHighscore = async function (p, c, s, pt, t) {
-      if (!db) return; try { await addDoc(collection(db, "highscores"), { player: p, company: c, score: s, parts: pt, time: t, version: APP_VERSION, timestamp: serverTimestamp() }); window.dbLoadTopScores(); } catch (e) { }
-    };
-    window.dbLoadTopScores = async function () {
-      if (!db) return; const lG = document.getElementById('global-highscore-content'), lS = document.getElementById('highscore-content');
-      const H = ``; // Header ist jetzt fest im HTML
+      if (!db) return;
       try {
-        // Lade massiv mehr Einträge (1000), um Dubletten filtern zu können
-        const q = query(collection(db, "highscores"), orderBy("score", "desc"), limit(1000));
+        const payload = { player: p, company: c, score: s, parts: pt, time: t, version: APP_VERSION, timestamp: serverTimestamp() };
+        
+        // 1. Immer in die Historie schreiben
+        await addDoc(collection(db, "highscores"), payload);
+
+        // 2. Prüfen ob neuer persönlicher Rekord für 'leaders'
+        const leaderId = (p + "_" + c).toLowerCase().replace(/[^a-z0-9]/g, "_");
+        const leaderRef = doc(db, "leaders", leaderId);
+        const leaderSnap = await getDoc(leaderRef);
+
+        if (!leaderSnap.exists() || s > leaderSnap.data().score) {
+          console.log("[DB] Neuer persönlicher Rekord! Aktualisiere Bestenliste.");
+          await setDoc(leaderRef, payload);
+        }
+        
+        window.dbLoadTopScores();
+      } catch (e) { console.error("[DB] Fehler beim Speichern:", e); }
+    };
+
+    // NEU: Lädt nur noch die Top 10 aus der 'leaders' Sammlung (Extrem schnell & günstig)
+    window.dbLoadTopScores = async function () {
+      if (!db) return; 
+      const lG = document.getElementById('global-highscore-content'), lS = document.getElementById('highscore-content');
+      try {
+        const q = query(collection(db, "leaders"), orderBy("score", "desc"), limit(10));
         const snap = await getDocs(q);
         let html = ""; let r = 1;
-        const seenPlayers = new Set();
 
         snap.forEach((doc) => {
-          if (r > 10) return;
           const d = doc.data();
-          const playerKey = (d.player + "|||" + d.company).toLowerCase();
-
-          if (seenPlayers.has(playerKey)) return;
-          seenPlayers.add(playerKey);
-
           const vStr = d.version ? `<small style="opacity:0.4; font-size:8px; margin-left:2px;">v${d.version}</small>` : "";
           const statsStr = (d.parts && d.time) ? `<span style="font-size:12px; color:var(--light1); font-weight:400; min-width:110px; text-align:right; margin-right:15px;">${d.parts} 📦 / ${Math.round(d.time)}s</span>` : `<span style="min-width:110px;"></span>`;
 
@@ -359,8 +373,9 @@
           </div>`;
           r++;
         });
-        if (lG) lG.innerHTML = H + (html || "Keine Einträge."); if (lS) lS.innerHTML = H + (html || "Keine Einträge.");
-      } catch (e) { }
+        const finalHtml = html || "Keine Einträge.";
+        if (lG) lG.innerHTML = finalHtml; if (lS) lS.innerHTML = finalHtml;
+      } catch (e) { console.error("[DB] Fehler beim Laden:", e); }
     };
     window.dbLoadTopScores();
   </script>
