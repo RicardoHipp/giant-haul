@@ -1,4 +1,4 @@
-// Version: 1.0.63
+// Version: 1.0.64
 importScripts('version.js');
 
 const CACHE_NAME = 'titan-haul-cache-v' + APP_VERSION;

@@ -268,9 +268,14 @@ body {
   flex-direction: column;
   align-items: center;
   box-shadow: 0 0 60px rgba(243, 112, 33, .2), 0 12px 40px rgba(0, 0, 0, .7);
-  max-width: 550px;
+  max-width: 650px; /* Auf Desktop etwas breiter */
   width: 90%;
   animation: overlayPop .35s cubic-bezier(.22, 1.5, .5, 1) both;
+}
+
+.hs-list-main {
+  max-height: none;
+  overflow-y: visible;
 }
 
 .go-actions-mobile { display: none; }
@@ -334,6 +339,11 @@ body {
   #overlay-title .overlay-box,
   #overlay-register .overlay-box {
     left: 100px;
+  }
+
+  .hs-list-main {
+    max-height: 250px;
+    overflow-y: auto;
   }
 
   /* Texte & Buttons massiv vergrößern */
