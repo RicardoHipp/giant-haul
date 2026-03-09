@@ -11,7 +11,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700;900&family=Share+Tech+Mono&display=swap"
     rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=53" />
+  <link rel="stylesheet" href="style.css?v=54" />
   <link rel="manifest" href="manifest.json" />
 
   <!-- iOS PWA Meta Tags -->
@@ -319,7 +319,14 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
     import { getFirestore, collection, addDoc, getDocs, query, orderBy, limit, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
-    const firebaseConfig = { apiKey: "AIzaSyBK4ZuKw32nOh0gqGX7hIUi3Lo4wRVIJcU", authDomain: "titan-tower.firebaseapp.com", projectId: "titan-tower", storageBucket: "titan-tower.firebasestorage.app", messagingSenderId: "992717085672", appId: "1:992717085672:web:7c9aba147acc614b0c225d" };
+    const firebaseConfig = {
+      apiKey: "AIzaSyAYrbewR-WbHHnnHnbg047nsqKve9zS4xU",
+      authDomain: "giant-haul.firebaseapp.com",
+      projectId: "giant-haul",
+      storageBucket: "giant-haul.firebasestorage.app",
+      messagingSenderId: "803768066594",
+      appId: "1:803768066594:web:a778a1a74f06acf63ee07b"
+    };
     const app = initializeApp(firebaseConfig); const db = getFirestore(app);
     window.dbSaveHighscore = async function (p, c, s, pt, t) {
       if (!db) return; try { await addDoc(collection(db, "highscores"), { player: p, company: c, score: s, parts: pt, time: t, version: APP_VERSION, timestamp: serverTimestamp() }); window.dbLoadTopScores(); } catch (e) { }
