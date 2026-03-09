@@ -67,25 +67,19 @@ function checkPlayerProfile() {
     window.dbLoadTopScores();
   }
 
-  // Zeige IMMER die Registrierung beim ersten Laden der Seite
+  // Zeige Schritt 1: Titel & Bestenliste
+  document.getElementById('overlay-title').classList.remove('hidden');
+  document.getElementById('overlay-register').classList.add('hidden');
   document.getElementById('overlay-start').classList.add('hidden');
-  document.getElementById('overlay-register').classList.remove('hidden');
 
   const pInput = document.getElementById('input-playername');
   const cInput = document.getElementById('input-companyname');
 
   if (globalPlayerName) {
-    // Profil existiert -> Felder vorbefüllen
     pInput.value = globalPlayerName;
     cInput.value = globalCompanyName;
-
     updateCompanyBranding();
   }
-
-  // Auto-Fokus auf das Namensfeld (mit leichter Verzögerung für Mobile-Browser)
-  setTimeout(() => {
-    if (pInput) pInput.focus();
-  }, 300);
 }
 
 // ===================================================================

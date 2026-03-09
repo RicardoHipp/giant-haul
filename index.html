@@ -11,7 +11,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700;900&family=Share+Tech+Mono&display=swap"
     rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=52" />
+  <link rel="stylesheet" href="style.css?v=53" />
   <link rel="manifest" href="manifest.json" />
 
   <!-- iOS PWA Meta Tags -->
@@ -128,41 +128,70 @@
       <span class="send-hint">oder <kbd>ENTER</kbd> / Rechtsklick</span>
     </div>
 
-    <!-- Start Overlay -->
-    <div id="overlay-start" class="game-overlay">
+    <!-- Schritt 1: Titel & Bestenliste -->
+    <div id="overlay-title" class="game-overlay">
       <button class="company-btn big btn-fullscreen-external" onclick="toggleFullScreen()"><span
           style="font-size: 50px; display:block; margin-bottom:10px;">⛶</span>VOLLBILD</button>
       <div class="overlay-box">
         <div class="overlay-logo company-name-display">COMPANY</div>
-        <h1 class="overlay-title">GIANT<br><span class="overlay-sub">HAUL</span></h1>
-        <p class="overlay-desc">Belade den LKW mit dem Schwerlast-Roboter – so viele Kisten wie möglich!</p>
-        <!-- Anleitung Desktop -->
+        <h1 class="overlay-title" style="line-height: 0.9;">GIANT<br><span class="overlay-sub" style="font-size: 0.8em;">HAUL</span></h1>
+        
+        <div id="start-highscores-list" class="go-stats"
+          style="font-size: 11px; margin: 15px 0; max-height: 250px; overflow-y: auto; background: rgba(0,0,0,0.4); width: 100%; border: 1px solid rgba(255,255,255,0.1);">
+          <div
+            style="text-align: center; color: var(--company-orange); font-size: 13px; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px; position: sticky; top: 0; background: #0d1117; padding: 5px 0; z-index: 10;">
+            TOP 10 WELTWEIT</div>
+          <div id="highscore-content">Lade Bestenliste...</div>
+        </div>
+
+        <button class="company-btn big" style="width: 100%;"
+          onclick="document.getElementById('overlay-title').classList.add('hidden'); document.getElementById('overlay-register').classList.remove('hidden');">ZUR ANMELDUNG</button>
+      </div>
+    </div>
+
+    <!-- Schritt 2: Registrierung (Nur Name & Firma) -->
+    <div id="overlay-register" class="game-overlay hidden">
+      <div class="overlay-box">
+        <h2 class="go-title" style="color:var(--company-orange); margin-bottom: 25px; text-align: center;">
+          SPIELEREINRICHTUNG</h2>
+        <div class="input-group">
+          <label for="input-playername">SPIELERNAME</label>
+          <input type="text" id="input-playername" placeholder="Dein Name" maxlength="20" />
+        </div>
+        <div class="input-group">
+          <label for="input-companyname">FIRMA / TEAM</label>
+          <input type="text" id="input-companyname" placeholder="Deine Firma" maxlength="8" />
+        </div>
+        <button id="btn-save-profile" class="company-btn big" style="width: 100%; margin-top: 20px;"
+          onclick="savePlayerProfile()">SPEICHERN & WEITER</button>
+      </div>
+    </div>
+
+    <!-- Schritt 3: Einsatz-Briefing (Anleitung & Start) -->
+    <div id="overlay-start" class="game-overlay hidden">
+      <div class="overlay-box">
+        <h2 class="go-title" style="color:var(--company-orange); margin-bottom: 10px;">EINSATZ-BRIEFING</h2>
+        <p class="overlay-desc" style="margin-top: 0;">Kurzanleitung für den Schwerlast-Einsatz:</p>
+        
         <div class="instr-desktop"
-          style="background: rgba(243,112,33,0.12); border: 1px solid var(--company-orange); border-radius: 10px; padding: 16px 20px; margin: 14px 0; font-size: 18px; line-height: 2; font-family: 'Share Tech Mono', monospace; text-align: left; width: 100%; box-sizing: border-box;">
-          <kbd style="font-size:15px;">SPACE</kbd> / Klick = <strong>Kiste abwurf</strong><br>
-          <kbd style="font-size:15px;">ENTER</kbd> / Rechtsklick = <strong>LKW abschicken</strong><br>
-          <kbd style="font-size:15px;">W</kbd> / <kbd style="font-size:15px;">S</kbd> / Mausrad = <strong>Speed
-            ±</strong>
+          style="background: rgba(243,112,33,0.12); border: 1px solid var(--company-orange); border-radius: 10px; padding: 16px 20px; margin: 14px 0; font-size: 18px; line-height: 1.6; font-family: 'Share Tech Mono', monospace; text-align: left; width: 100%; box-sizing: border-box;">
+          <kbd style="font-size:15px;">SPACE</kbd> = <strong>Abwurf</strong><br>
+          <kbd style="font-size:15px;">ENTER</kbd> = <strong>LKW abschicken</strong><br>
+          <kbd style="font-size:15px;">W</kbd> / <kbd style="font-size:15px;">S</kbd> = <strong>Speed ±</strong>
         </div>
-        <!-- Anleitung Mobil -->
         <div class="instr-mobile"
-          style="background: rgba(243,112,33,0.12); border: 1px solid var(--company-orange); border-radius: 10px; padding: 16px 20px; margin: 14px 0; font-size: 18px; line-height: 2; font-family: 'Share Tech Mono', monospace; text-align: left; width: 100%; box-sizing: border-box;">
-          <strong>Rechts tippen</strong> = Kiste abwurf<br>
-          <strong>Links wischen ↑↓</strong> = Speed ±<br>
-          <kbd style="font-size:15px;">ENTER</kbd> / Button = <strong>LKW abschicken</strong>
+          style="background: rgba(243,112,33,0.12); border: 1px solid var(--company-orange); border-radius: 10px; padding: 16px 20px; margin: 14px 0; font-size: 18px; line-height: 1.6; font-family: 'Share Tech Mono', monospace; text-align: left; width: 100%; box-sizing: border-box;">
+          <strong>Rechts tippen</strong> = Abwurf<br>
+          <strong>Links wischen</strong> = Speed ±<br>
+          <strong>Button</strong> = LKW abschicken
         </div>
-        <p class="overlay-desc" style="font-size: 13px; margin-top: 0;">Roboter holt neue Kisten <strong>am
-            Rand</strong> ab.<br>Fällt eine Kiste runter → Runde vorbei!<br><small>Punkte = Teile² × 250 / (10 + √Zeit × 5)</small>
-        </p>
 
-        <div style="display: flex; gap: 15px; justify-content: center; margin-top: 5px;">
-          <button id="btn-start" class="company-btn big" style="flex: 2;" onclick="game.start()">START</button>
+        <div style="display: flex; gap: 15px; justify-content: center; margin-top: 5px; width: 100%;">
+          <button id="btn-start" class="company-btn big" style="flex: 2;" onclick="game.start()">MISSION STARTEN</button>
           <button class="company-btn big"
-            style="flex: 1.5; background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.3); font-size: 14px;"
-            onclick="document.getElementById('overlay-manual').classList.remove('hidden')">ANLEITUNG</button>
+            style="flex: 1.2; background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.3); font-size: 14px;"
+            onclick="document.getElementById('overlay-manual').classList.remove('hidden')">DETAILS</button>
         </div>
-
-        <p class="overlay-hint">Klick / Leertaste = Abwurf</p>
       </div>
     </div>
 
@@ -242,50 +271,38 @@
 
     <!-- Game Over Overlay -->
     <div id="overlay-gameover" class="game-overlay hidden">
-      <div class="overlay-box">
-        <div class="go-icon" id="go-icon">⚠</div>
-        <h2 class="go-title" id="go-title">SYSTEM FAULT</h2>
-        <p class="go-sub" id="go-sub">Kiste vom LKW gefallen!</p>
-        <div class="go-stats">
-          <div class="stat-row"><span>Teile geladen:</span><span id="go-parts">0</span></div>
-          <div class="stat-row"><span>Zeit:</span><span id="go-time">0s</span></div>
-          <div class="stat-row"><span>Punkte:</span><span id="go-score">0</span></div>
-          <div class="stat-row"><span>Lokaler Highscore:</span><span id="go-hi">0</span></div>
+      <div class="overlay-box go-box-wide">
+        <div class="go-header">
+          <div class="go-icon" id="go-icon">⚠</div>
+          <h2 class="go-title" id="go-title">SYSTEM FAULT</h2>
         </div>
-        <div id="global-highscores-list" class="go-stats"
-          style="font-size: 12px; margin-bottom: 20px; min-height: 60px; margin-top: 15px;">
-          <div
-            style="text-align: center; color: var(--company-orange); font-size: 14px; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;">
-            TOP 10 WELTWEIT</div>
-          Lade Bestenliste...
-        </div>
-        <button class="company-btn big" onclick="game.restart()">NEUSTART</button>
-      </div>
-    </div>
+        
+        <div class="go-content-wrapper">
+          <div class="go-main-stats">
+            <p class="go-sub" id="go-sub">Kiste vom LKW gefallen!</p>
+            <div class="go-stats">
+              <div class="stat-row"><span>Teile geladen:</span><span id="go-parts">0</span></div>
+              <div class="stat-row"><span>Zeit:</span><span id="go-time">0s</span></div>
+              <div class="stat-row"><span>Punkte:</span><span id="go-score">0</span></div>
+              <div class="stat-row"><span>Lokaler Highscore:</span><span id="go-hi">0</span></div>
+            </div>
+            <div class="go-actions-mobile">
+              <button class="company-btn big" onclick="game.restart()" style="width: 100%;">NEUSTART</button>
+            </div>
+          </div>
 
-    <!-- Registration Overlay -->
-    <div id="overlay-register" class="game-overlay">
-      <button class="company-btn big btn-fullscreen-external" onclick="toggleFullScreen()"><span
-          style="font-size: 50px; display:block; margin-bottom:10px;">⛶</span>VOLLBILD</button>
-      <div class="overlay-box">
-        <h2 class="go-title" style="color:var(--company-orange); margin-bottom: 20px; text-align: center;">
-          SPIELEREINRICHTUNG</h2>
-        <p class="go-sub" style="margin-bottom: 20px;">Trage deinen Namen ein, um in der Bestenliste zu erscheinen.</p>
-        <div id="start-highscores-list" class="go-stats"
-          style="font-size: 12px; margin-bottom: 20px; min-height: 60px;">
-          <div
-            style="text-align: center; color: var(--company-orange); font-size: 14px; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;">
-            TOP 10 WELTWEIT</div>
-          Lade Bestenliste...
+          <div id="global-highscores-list" class="go-stats highscore-box-mobile"
+            style="font-size: 12px; min-height: 60px;">
+            <div
+              style="text-align: center; color: var(--company-orange); font-size: 14px; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;">
+              TOP 10 WELTWEIT</div>
+            <div id="global-highscore-content">Lade Bestenliste...</div>
+          </div>
         </div>
-        <div class="input-group"><label for="input-playername">SPIELERNAME</label><input type="text"
-            id="input-playername" placeholder="Name" maxlength="20" autocomplete="off" autocorrect="off"
-            autocapitalize="words" spellcheck="false" /></div>
-        <div class="input-group"><label for="input-companyname">FIRMENNAME / TEAM</label><input type="text"
-            id="input-companyname" placeholder="Firma" maxlength="8" autocomplete="off" autocorrect="off"
-            autocapitalize="characters" spellcheck="false" /></div>
-        <button id="btn-save-profile" class="company-btn big" style="width: 100%; margin-top: 25px;"
-          onclick="savePlayerProfile()">SPEICHERN & STARTEN</button>
+
+        <div class="go-actions-desktop">
+          <button class="company-btn big" onclick="game.restart()">NEUSTART</button>
+        </div>
       </div>
     </div>
 
@@ -308,8 +325,8 @@
       if (!db) return; try { await addDoc(collection(db, "highscores"), { player: p, company: c, score: s, parts: pt, time: t, version: APP_VERSION, timestamp: serverTimestamp() }); window.dbLoadTopScores(); } catch (e) { }
     };
     window.dbLoadTopScores = async function () {
-      if (!db) return; const lG = document.getElementById('global-highscores-list'), lS = document.getElementById('start-highscores-list');
-      const H = `<div style="text-align: center; color: var(--company-orange); font-size: 14px; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;">TOP 10 WELTWEIT</div>`;
+      if (!db) return; const lG = document.getElementById('global-highscore-content'), lS = document.getElementById('highscore-content');
+      const H = ``; // Header ist jetzt fest im HTML
       try {
         // Lade massiv mehr Einträge (1000), um Dubletten filtern zu können
         const q = query(collection(db, "highscores"), orderBy("score", "desc"), limit(1000));
@@ -342,7 +359,7 @@
   </script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
-  <script src="script.js?v=56"></script>
+  <script src="script.js?v=57"></script>
   <script>
     (function () {
       const GAME_W = 1920, GAME_H = 1080;
