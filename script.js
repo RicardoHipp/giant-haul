@@ -752,6 +752,8 @@ class GiantTower {
   _buildTruckBody() {
     const world = this.engine.world;
     if (this.matterBodies.platform) World.remove(world, this.matterBodies.platform);
+    if (this.matterBodies.cabWall) World.remove(world, this.matterBodies.cabWall);
+    if (this.matterBodies.rearWall) World.remove(world, this.matterBodies.rearWall);
     const t = this.truck;
     const platCx = t.platformLeft + t.PLAT_W / 2;
     const platCy = t.platformTop + t.PLAT_H / 2;
@@ -802,6 +804,8 @@ class GiantTower {
     Audio.startTruckEngine();
 
     this._buildStaticBodies();
+
+    this._lastTime = null; // dt-Reset: erster Frame nach Start/Neustart hat dt=0
 
     document.getElementById('overlay-start').classList.add('hidden');
     document.getElementById('overlay-gameover').classList.add('hidden');
@@ -1001,7 +1005,7 @@ class GiantTower {
   // --- GAME LOOP ---
   _loop(ts) {
     if (!this._lastTime) this._lastTime = ts;
-    const dt = Math.min((ts - this._lastTime) / 1000, 0.05);
+    const dt = Math.min((ts - this._lastTime) / 1000, 0.025);
     this._lastTime = ts;
     this._update(dt);
     this._draw();
@@ -1058,8 +1062,10 @@ class GiantTower {
       document.getElementById('hud-score').textContent = liveScore;
     }
 
-    // Matter.js Engine schritt
-    Engine.update(this.engine, dt * 1000);
+    // Matter.js Engine schritt (2 Sub-Steps für bessere Kollisionserkennung bei dünnen Flächen)
+    const subDt = dt * 500;
+    Engine.update(this.engine, subDt);
+    Engine.update(this.engine, subDt);
 
     // LKW update
     const prevState = this.truck.state;
