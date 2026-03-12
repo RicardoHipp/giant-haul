@@ -239,6 +239,15 @@ body {
   font-size: 16px;
 }
 
+#btn-restart {
+  font-size: 32px;
+  padding: 24px 40px;
+  gap: 12px;
+}
+#btn-restart .btn-icon {
+  font-size: 38px;
+}
+
 /* ===================================================================
    START / GAME-OVER OVERLAY
    =================================================================== */

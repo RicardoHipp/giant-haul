@@ -273,7 +273,7 @@ class Block {
     this.w = type.w;
     this.h = type.h;
     this.body = null;        // Matter.js Body (nach Abwurf)
-    this.glowTimer = 0;
+
     this.settledFrames = 0;
     this.settled = false;
     this.counted = false;
@@ -293,17 +293,19 @@ class Block {
     ctx.translate(x, y);
     ctx.rotate(a);
 
-    if (this.glowTimer > 0) {
-      ctx.shadowColor = '#f37021';
-      ctx.shadowBlur = 28 * (this.glowTimer / 0.6);
-    }
-
     // Hauptfläche
     ctx.save();
     ctx.shadowColor = 'rgba(0,0,0,0.45)'; ctx.shadowBlur = 10; ctx.shadowOffsetY = 4;
     roundRect(ctx, -hw, -hh, this.w, this.h, 5);
     ctx.fillStyle = this.type.color; ctx.fill();
     ctx.restore();
+
+    // Orange Overlay für gezählte Blöcke
+    if (this.counted) {
+      roundRect(ctx, -hw, -hh, this.w, this.h, 5);
+      ctx.fillStyle = 'rgba(243,112,33,0.55)';
+      ctx.fill();
+    }
 
     // Streifen
     ctx.save();
@@ -774,7 +776,6 @@ class GiantTower {
       { isStatic: true, label: 'cabwall', friction: 0.5, restitution: 0.01 }
     );
 
-    // Rückwand rechts: physikalischer Körper, doppelt so hoch wie vorher (32px)
     const REAR_W = 10, REAR_H = 32;
     const rearWall = Bodies.rectangle(
       t.platformLeft + t.PLAT_W + REAR_W / 2 - 4,  // rechts an der Ladefläche
@@ -986,8 +987,28 @@ class GiantTower {
       .map(b => ({ body: b.body, relX: b.body.position.x - this.truck.x, relY: b.body.position.y }));
     this._truckBlocks.forEach(rb => Body.setStatic(rb.body, true));
 
+    // Nicht-gezählte Kisten explodieren lassen
+    const world = this.engine.world;
+    this.physicsBlocks.forEach(b => {
+      if (b.body && !b.counted) {
+        const px = b.body.position.x, py = b.body.position.y;
+        for (let i = 0; i < 16; i++) {
+          this.particles.push(new Particle(px, py, i % 3 === 0 ? '#f37021' : b.type.color));
+        }
+        World.remove(world, b.body);
+        b.body = null;
+      }
+    });
+    this.physicsBlocks = this.physicsBlocks.filter(b => b.counted);
+
     Audio.stopServo();
     this.truck.state = 'leaving';
+
+    // Platform-Bodies sofort entfernen
+    if (this.matterBodies.platform) { World.remove(world, this.matterBodies.platform); this.matterBodies.platform = null; }
+    if (this.matterBodies.cabWall)  { World.remove(world, this.matterBodies.cabWall);  this.matterBodies.cabWall = null; }
+    if (this.matterBodies.rearWall) { World.remove(world, this.matterBodies.rearWall); this.matterBodies.rearWall = null; }
+
     Audio.startTruckEngine();
     Audio.playTruckHorn();
 
@@ -1158,7 +1179,7 @@ class GiantTower {
         // Liegt der Block noch auf dem LKW (nicht runtergefallen)?
         const bx = block.body.position.x;
         const by = block.body.position.y;
-        const onTruck = bx >= this.truck.platformLeft - 30
+        const onTruck = bx >= this.truck.x - 30
           && bx <= this.truck.platformRight + 30
           && by < this.floorY - 10;
 
@@ -1175,8 +1196,7 @@ class GiantTower {
         }
       }
 
-      // Glow-Timer
-      if (block.glowTimer > 0) block.glowTimer -= dt;
+
     }
 
     // Bereits gezählte Blöcke: prüfen ob einer vom LKW gerutscht ist
@@ -1223,6 +1243,21 @@ class GiantTower {
 
     // LKW
     if (this.truck) this.truck.draw(ctx);
+
+    // Stats auf Fahrgestell
+    if (this.truck && (this.truck.state === 'loading' || this.truck.state === 'leaving')) {
+      const t = this.truck;
+      const cx = t.platformCenterX;
+      const cy = t.floorY - t.WHEEL_R * 2 + 28;
+      const pts = t.state === 'leaving' ? this.score
+        : (this.truckParts > 0 ? Math.round(this.truckParts * this.truckParts * 250 / (10 + Math.sqrt(Math.max(this.loadingTime, 1)) * 5)) : 0);
+      ctx.save();
+      ctx.font = 'bold 28px "Roboto Condensed",sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillStyle = '#f37021';
+      ctx.fillText(`${Math.round(this.loadingTime)}s  ·  ${this.truckParts} Teile  ·  ${pts} Pts`, cx, cy);
+      ctx.restore();
+    }
 
     // Alle Physik-Blöcke
     this.physicsBlocks.forEach(b => b.drawBody(ctx));

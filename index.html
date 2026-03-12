@@ -11,7 +11,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700;900&family=Share+Tech+Mono&display=swap"
     rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=67" />
+  <link rel="stylesheet" href="style.css?v=71" />
   <link rel="manifest" href="manifest.json" />
 
   <!-- iOS PWA Meta Tags -->
@@ -140,7 +140,7 @@
           style="font-size: 11px; margin: 15px 0; background: rgba(0,0,0,0.4); width: 100%; border: 1px solid rgba(255,255,255,0.1);">
           <div
             style="text-align: center; color: var(--company-orange); font-size: 13px; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px; position: sticky; top: 0; background: #0d1117; padding: 5px 0; z-index: 10;">
-            TOP 10 WELTWEIT</div>
+            TOP 10 · LETZTE 10 TAGE</div>
           <div id="highscore-content">Lade Bestenliste...</div>
         </div>
 
@@ -295,7 +295,7 @@
             style="font-size: 12px; min-height: 60px;">
             <div
               style="text-align: center; color: var(--company-orange); font-size: 14px; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;">
-              TOP 10 WELTWEIT</div>
+              TOP 10 · LETZTE 10 TAGE</div>
             <div id="global-highscore-content">Lade Bestenliste...</div>
           </div>
         </div>
@@ -352,28 +352,37 @@
       } catch (e) { console.error("[DB] Fehler beim Speichern:", e); }
     };
 
-    // NEU: Lädt nur noch die Top 10 aus der 'leaders' Sammlung (Extrem schnell & günstig)
+    // Lädt Top 10 der letzten 10 Tage aus der 'leaders' Sammlung
     window.dbLoadTopScores = async function () {
-      if (!db) return; 
+      if (!db) return;
       const lG = document.getElementById('global-highscore-content'), lS = document.getElementById('highscore-content');
       try {
-        const q = query(collection(db, "leaders"), orderBy("score", "desc"), limit(10));
+        const tenDaysAgo = Date.now() - 10 * 24 * 60 * 60 * 1000;
+        const q = query(collection(db, "leaders"), orderBy("score", "desc"), limit(30));
         const snap = await getDocs(q);
         let html = ""; let r = 1;
 
         snap.forEach((doc) => {
+          if (r > 10) return;
           const d = doc.data();
+          const ts = d.timestamp ? d.timestamp.toDate() : null;
+          if (ts && ts.getTime() < tenDaysAgo) return;
+
+          const daysSince = ts ? Math.floor((Date.now() - ts.getTime()) / (1000 * 60 * 60 * 24)) : null;
+          const ageStr = daysSince === null ? '' : daysSince === 0 ? 'heute' : `${daysSince}T`;
+          const ageHtml = ageStr ? `<span style="color:var(--company-orange); margin-left:6px;">(${ageStr})</span>` : '';
+
           const vStr = d.version ? `<small style="opacity:0.4; font-size:8px; margin-left:2px;">v${d.version}</small>` : "";
           const statsStr = (d.parts && d.time) ? `<span style="font-size:12px; color:var(--light1); font-weight:400; min-width:110px; text-align:right; margin-right:15px;">${d.parts} 📦 / ${Math.round(d.time)}s</span>` : `<span style="min-width:110px;"></span>`;
 
           html += `<div class="stat-row" style="height:auto; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); align-items: center;">
-            <span style="flex:1; text-align:left; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; padding-right:10px;">${r}. ${d.player} [${d.company}]${vStr}</span>
+            <span style="flex:1; text-align:left; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; padding-right:10px;">${r}. ${d.player} [${d.company}]${vStr}${ageHtml}</span>
             ${statsStr}
             <span style="font-weight:900; color:var(--company-orange); min-width:60px; text-align:right; font-size:16px;">${d.score}</span>
           </div>`;
           r++;
         });
-        const finalHtml = html || "Keine Einträge.";
+        const finalHtml = html || "Keine Einträge der letzten 10 Tage.";
         if (lG) lG.innerHTML = finalHtml; if (lS) lS.innerHTML = finalHtml;
       } catch (e) { console.error("[DB] Fehler beim Laden:", e); }
     };
@@ -381,7 +390,7 @@
   </script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
-  <script src="script.js?v=67"></script>
+  <script src="script.js?v=71"></script>
   <script>
     (function () {
       const GAME_W = 1920, GAME_H = 1080;
